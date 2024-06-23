@@ -1,25 +1,11 @@
 --this is a test to see if it updates on github...
+local totAPI = require("totAPI")
 local screenW,screenL = term.getSize()
-
-local function split(string, chunkSize)
-    local chunks = {} 
-    local chunk = "" 
-    for word in string:gfind("%A?%a+%A?") do 
-        if #chunk+#word < chunkSize then 
-            chunk = chunk..word 
-        else 
-            chunks[#chunks+1] = chunk 
-            chunk = word 
-        end 
-    end
-    chunks[#chunks+1] = chunk
-    return chunks
-end
 
 function setupScreen(options) --{{option name = string, option info = string, background colour = number, text colour = number},{...}}
     for _,option in pairs(options) do
         local optionName = option.name
-        local optionInfo = split(option.info,screenW)
+        local optionInfo = totAPI.splitToChunksByWords(option.info,screenW)
         local optionBC = option.BC
         local optionTC = option.TC
         local isEditing = true
@@ -32,7 +18,6 @@ function setupScreen(options) --{{option name = string, option info = string, ba
             term.write(optionInfo[i])
         end
         while true do
-                
             local eventData = {os.pullEvent()}
             local event = eventData[1]
             if event == "mouse_click" then
@@ -62,7 +47,7 @@ function printReceipt(playerName, receipt, priceList)
     printer.newPage()
     cursorPos = 1
     local total = 0
-    printer.setPageTitle("Recipt from Phottoquick")
+    printer.setPageTitle("Receipt from Phottoquick")
     printer.setCursorPos(1,1)
     printer.write("Invoice for "..playerName.. ":")
     for i = 1, #receipt do
@@ -78,7 +63,7 @@ function printReceipt(playerName, receipt, priceList)
 end
 -- "ooga booga" - QuickPlayz_ 19/06/2024
 function cost() --returns cost of frame type
-    local frameType = "frameType1"
+    local frameType = "frameType1"        
     local frameCost = 0
     if frameType == "B&W frames" then
         return 1, "cog"
