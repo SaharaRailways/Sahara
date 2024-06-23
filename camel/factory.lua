@@ -47,10 +47,10 @@ repeat
 		elseif input == "READ" then
 			print("enter the name of the cart")
 			local cartName = read()
-			itemCartList = camel.readSavedCart(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
+			itemCartList, price = camel.readSavedCart(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
 		elseif input == "ADD" then
 			item = read()
-			itemCartList = camel.addToCart(item, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
+			itemCartList, price = camel.addToCart(item, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
 		end
 until input == "DONE"
 

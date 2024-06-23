@@ -96,10 +96,10 @@ function camel.readSavedCart(cartList, cartName, outOfStockList, priceList, lowS
             break
         end
         local amount = file.readLine()
-        cartList = camel.addToCart(item, outOfStockList, cartList, priceList, lowStockList, stockAmountList, price, amount)
+        cartList, price = camel.addToCart(item, outOfStockList, cartList, priceList, lowStockList, stockAmountList, price, amount)
     end
     file.close()
-    return cartList
+    return cartList, price
 end
 
 function camel.getDepotItem(depotName)
@@ -116,15 +116,15 @@ function camel.addToCart(item, outOfStockList, cartList, priceList, lowStockList
 			if cartList[item] + ammount <= stockAmountList[item] then
 				print(item)
 				cartList[item] = itemCartList[item] + ammount
-				price = priceList[item] + price
+				price = priceList[item] + (price * ammount)
 			end
 		else
 			print(item)
 			cartList[item] = cartList[item] + ammount
-			price = priceList[item] + price
+			price = priceList[item] + (price * ammount)
 		end
 	end
-    return cartList
+    return cartList, price
 end
 
 return camel

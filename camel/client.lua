@@ -137,7 +137,7 @@ repeat
 				print("scroll: "..scroll)
 			else
 				input = itemList[scroll * scroll_height + ypos]
-				camel.addToCart(input, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
+				itemCartList, price = camel.addToCart(input, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
 				writeCart()
 				--if stockAmountList[input] then
 					-- finish this pls ok i'm gonna make it long so you can see it ok now don't ignore it
@@ -188,10 +188,10 @@ repeat
 		elseif input == "READ" then
 			print("enter the name of the cart")
 			local cartName = read()
-			itemCartList = camel.readSavedCart(itemCartList, cartName)
+			itemCartList, price = camel.readSavedCart(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
 		elseif input == "ADD" then
 			item = read()
-			itemCartList = camel.addToCart(item, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
+			itemCartList, price = camel.addToCart(item, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
 			writeCart()
 		end
 	end
