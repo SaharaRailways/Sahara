@@ -62,7 +62,7 @@ function printReceipt(playerName, receipt, priceList)
     
 end
 -- "ooga booga" - QuickPlayz_ 19/06/2024
-function cost() --returns cost of frame type
+function cost(frameType) --returns cost of frame type
     local frameType = "frameType1"        
     local frameCost = 0
     if frameType == "B&W frames" then
