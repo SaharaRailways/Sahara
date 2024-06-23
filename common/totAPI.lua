@@ -4,7 +4,7 @@ tot = {}
 function tot.listLen(list)
 	--returns the length of the list (this is for key value pairs)
 	local counter = 0
-	for k, v in pairs(list) do
+	for _, _ in pairs(list) do
 		counter = counter + 1
 	end
 	return counter
@@ -12,7 +12,7 @@ end
 function tot.keyToIndex(list, key)
 	--turns key into its index in the list
 	local counter = 0
-	for k, v in pairs(list) do
+	for k in pairs(list) do
 		counter = counter + 1
 		if k == key then
 			return counter
@@ -24,7 +24,7 @@ end
 function tot.indexToKey(list, index)
 	--turns the index in list into the key 
 	local counter = 0
-	for k, v in pairs(list) do
+	for k in pairs(list) do
 		counter = counter + 1
 		if counter == index then
 			return k
