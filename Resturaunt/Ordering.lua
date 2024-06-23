@@ -18,8 +18,8 @@ tableList[item15] = {}
 
 local payment = rs.getInput("back")
 local menuItem = rs.getAnalogInput("right")
-local table1 = peripheral.find("minecraft:barrel")
-local storage = peripheral.find("minecraft:chest")
+local table1 = peripheral.wrap("minecraft:barrel_0")
+local storage = peripheral.wrap("minecraft:chest_0")
 
 local function getTableBySignal(signal)
     local tableName = "item" .. signal
