@@ -9,7 +9,7 @@ function tot.listLen(list)
 	end
 	return counter
 end
-local function tot.splitToChunksByWords(string, maxChunkSize)
+function tot.splitToChunksByWords(string, maxChunkSize)
     local chunks = {} 
     local chunk = "" 
     for word in string:gfind("%A?%a+%A?") do 
