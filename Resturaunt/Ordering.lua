@@ -1,4 +1,4 @@
-tableList = {}
+tableList = {} -- each item table delivers items from its number slot in the storage and delivers it to the table 
 tableList[item1] = {1, 5, 6}
 tableList[item2] = {}
 tableList[item3] = {}
