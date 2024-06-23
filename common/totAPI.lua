@@ -4,10 +4,24 @@ tot = {}
 function tot.listLen(list)
 	--returns the length of the list (this is for key value pairs)
 	local counter = 0
-	for _, _ in pairs(list) do
+	for _ in pairs(list) do
 		counter = counter + 1
 	end
 	return counter
+end
+local function tot.splitToChunksByWords(string, maxChunkSize)
+    local chunks = {} 
+    local chunk = "" 
+    for word in string:gfind("%A?%a+%A?") do 
+        if #chunk+#word < maxChunkSize then 
+            chunk = chunk..word 
+        else 
+            chunks[#chunks+1] = chunk 
+            chunk = word 
+        end 
+    end
+    chunks[#chunks+1] = chunk
+    return chunks
 end
 function tot.keyToIndex(list, key)
 	--turns key into its index in the list
