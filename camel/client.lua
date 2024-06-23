@@ -46,9 +46,9 @@ function writeCart()
 	monitor2.write("Price: "..price)
 	monitor2.setTextColour(1)
 	monitor2.setCursorPos(width-2,height)
-	monitor2.blit("«", "b", "f")
+	monitor2.blit(string.sub("«",2,2), "b", "f")
 	monitor2.setCursorPos(width,height)
-	monitor2.blit("»", "b", "f")
+	monitor2.blit(string.sub("»",2,2), "b", "f")
 end
 
 function writeStock()
@@ -77,9 +77,9 @@ function writeStock()
 	monitor.setCursorPos(1,height)
 	monitor.blit("Finish Order", "dddddddddddd", "ffffffffffff")
 	monitor.setCursorPos(width-2,height)
-	monitor.blit("«", "b", "f")
+	monitor.blit(string.sub("«",2,2), "b", "f")
 	monitor.setCursorPos(width,height)
-	monitor.blit("»", "b", "f")
+	monitor.blit(string.sub("»",2,2), "b", "f")
 end
 
 
