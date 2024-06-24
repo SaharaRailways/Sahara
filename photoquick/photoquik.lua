@@ -2,6 +2,38 @@
 local totAPI = require("totAPI")
 local screenW,screenL = term.getSize()
 
+function createInputBox(x,y,len)
+    local InputBox = {}
+    InputBox.x = x
+    InputBox.y = y
+    InputBox.len = len
+    InputBox.message = ""
+    function InputBox:getInput()
+        local eventData = {os.pullEvent()}
+        local event = eventData[1]
+        if event == "mouse_click" then
+            local mouseX = eventData[3]
+            local mouseY = eventData[4]
+            term.setCursorPos(mouseX,mouseY)
+            if mouseX >= self.x and mouseX =< self.x+len-1 and mouseY == self.y then
+                isEditing = true
+            else
+                isEditing = false
+            end
+        elseif event == "key" and isEditing then
+            local key = eventData[2]
+            if key > 0 and key < 256 then
+            stg = stg..string.char(key)
+            elseif key == 257 then
+                isEditing = false
+            end
+        end
+        term.setBackgroundColor(3)
+        term.setTextColor(7)
+        term.setCursorPos((screenW-screenW/4)/2,screenL/8)
+        term.write(stg:sub(-screenW/4,-1))
+    end
+end
 function setupScreen(options) --{{option name = string, option info = string, background colour = number, text colour = number},{...}}
     for _,option in pairs(options) do
         local optionName = option.name
@@ -17,28 +49,7 @@ function setupScreen(options) --{{option name = string, option info = string, ba
             term.setCursorPos((screenW-#optionInfo[i])/2+1,(screenL-#optionInfo)/2+i)
             term.write(optionInfo[i])
         end
-        while true do
-            local eventData = {os.pullEvent()}
-            local event = eventData[1]
-            if event == "mouse_click" then
-                local mouseX = eventData[3]
-                local mouseY = eventData[4]
-                if mouseX > (screenW-screenW/4)/2 and mouseX < (screenW+screenW/4)/2 and mouseY == math.floor(screenL/8) then
-                    isEditing = true
-                end
-            elseif event == "key" and isEditing then
-                local key = eventData[2]
-                if key > 0 and key < 256 then
-                stg = stg..string.char(key)
-                elseif key == 257 then
-                    isEditing = false
-                end
-            end
-            term.setBackgroundColor(3)
-            term.setTextColor(7)
-            term.setCursorPos((screenW-screenW/4)/2,screenL/8)
-            term.write(stg:sub(-screenW/4,-1))
-        end
+        
     end
 end
 
