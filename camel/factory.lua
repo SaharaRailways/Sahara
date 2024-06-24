@@ -6,6 +6,7 @@ money_stock = peripheral.wrap("create:depot_22")
 money_drop = peripheral.wrap("create:depot_7")
 monitor = peripheral.wrap("monitor_2")
 monitor2 = peripheral.wrap("monitor_3")
+--diamondStock = peripheral.wrap("redrouter_1")
 
 camel.requestStock()
 
