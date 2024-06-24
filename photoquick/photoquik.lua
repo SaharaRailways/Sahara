@@ -15,7 +15,7 @@ function createInputBox(x,y,len)
             local mouseX = eventData[3]
             local mouseY = eventData[4]
             term.setCursorPos(mouseX,mouseY)
-            if mouseX >= self.x and mouseX =< self.x+len-1 and mouseY == self.y then
+            if mouseX >= self.x and mouseX <= self.x+len-1 and mouseY == self.y then
                 isEditing = true
             else
                 isEditing = false
@@ -53,7 +53,7 @@ function setupScreen(options) --{{option name = string, option info = string, ba
     end
 end
 
-function printReceipt(playerName, receipt, priceList) 
+function printReceipt(playerName, receipt, priceList)
     printer = peripheral.find("printer")
     printer.newPage()
     cursorPos = 1
@@ -93,6 +93,7 @@ function cost(frameType) --returns cost of frame type
 end
 function generateReceipt(playerName, orderList, nationName) -- orderList = {frameType1Ammount = 5, frameType2Ammount = 3, frameType3Ammount = 7}
     local receipt = {}
+    local priceList = {}
     for frameType, ammount in pairs(orderList) do
         local frameCost, frameCurrency = cost(frameType)
             if not (frameCost == 1) then
@@ -104,7 +105,8 @@ function generateReceipt(playerName, orderList, nationName) -- orderList = {fram
         else
             table.insert(receipt, ammount.."x "..frameType..": "..frameCost.." "..frameCurrency)
         end
+        table.insert(priceList, frameCost * ammount)
     end
-    printReceipt("Szedan",{"Apple", "Banana", "Orange"},{1,2,3})
+    printReceipt(playerName,receipt,{1,2,3})
 end
 setupScreen({{name="shi",info="this is a long sentance that will be split up using code. The line will wrap around the screen",BC = 1,TC = 5}})
