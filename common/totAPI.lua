@@ -12,7 +12,7 @@ end
 function tot.splitString(string, maxChunkSize)
     local chunks = {} 
     local chunk = "" 
-    for word in string:gfind("%A?%a+%A?") do 
+    for word in string:gfind("%A?[%a%d]+%A?") do 
         if #chunk+#word < maxChunkSize then 
             chunk = chunk..word 
         else 
