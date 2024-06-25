@@ -60,13 +60,11 @@ function printReceipt(playerName, receipt, priceList, nationName)
     printer.setCursorPos(1,1)
     printer.write("Invoice for "..playerName.. " for nation:")
     for i = 1, #receipt do
-        cursorPos = cursorPos + 1
-        printer.setCursorPos(1,cursorPos)
         splitShit = totAPI.splitString(receipt[i]..": "..priceList[i], 25)
         for j = 1,#splitShit do
+            cursorPos = cursorPos + 1
             printer.setCursorPos(1,cursorPos)
             printer.write(splitShit[j])
-            cursorPos = cursorPos + 1
         end
         total = total + priceList[i]
     end
