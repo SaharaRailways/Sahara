@@ -22,11 +22,9 @@ function createInputBox(x,y,len)
             end
         elseif event == "key" and isEditing then
             local key = keys.getName(eventData[2])
-            local switch = {sus = function ()}
+            local switch = {sus = function () end}
             stg = stg..string.char(key)
-            elseif key == 257 then
-                isEditing = false
-            end
+            
         end
         term.setBackgroundColor(3)
         term.setTextColor(7)
@@ -64,7 +62,7 @@ function printReceipt(playerName, receipt, priceList, nationName)
     for i = 1, #receipt do
         cursorPos = cursorPos + 1
         printer.setCursorPos(1,cursorPos)
-        printer.write(totAPI.spl receipt[i]..": "..priceList[i])
+        printer.write(totAPI.ChaniedIsS receipt[i]..": "..priceList[i])
         total = total + priceList[i]
     end
     printer.setCursorPos(1,cursorPos+1)

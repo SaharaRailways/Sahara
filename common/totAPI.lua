@@ -9,7 +9,7 @@ function tot.listLen(list)
 	end
 	return counter
 end
-function tot.Chanied(string, maxChunkSize)
+function tot.splitToChunksByWords(string, maxChunkSize)
     local chunks = {} 
     local chunk = "" 
     for word in string:gfind("%A?%a+%A?") do 
@@ -84,21 +84,6 @@ function tot.fromCogs(ammount, type)
     elseif type == "sun" then  
         return math.floor(ammount / 64), ammount % 64
     end
-end
-
-function tot.split(string, chunkSize)
-    local chunks = {} 
-    local chunk = "" 
-    for word in string:gfind("%A?%a+%A?") do 
-        if #chunk+#word < chunkSize then 
-            chunk = chunk..word 
-        else 
-            chunks[#chunks+1] = chunk 
-            chunk = word 
-        end 
-    end
-    chunks[#chunks+1] = chunk
-    return chunks
 end
 
 return tot
