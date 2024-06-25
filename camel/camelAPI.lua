@@ -127,4 +127,17 @@ function camel.addToCart(item, outOfStockList, cartList, priceList, lowStockList
     return cartList, price
 end
 
+function camel.setStation(stationName)
+    -- Save the station name to a file in the saharasaves folder
+    fs.makeDir("saharasaves")  
+    local file = fs.open("saharasaves/station","w")
+    file.writeLine(stationName)
+    file.close()
+    
+end
+
+function camel.getStation()
+    
+end
+
 return camel

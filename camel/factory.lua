@@ -8,6 +8,44 @@ monitor = peripheral.wrap("monitor_2")
 monitor2 = peripheral.wrap("monitor_3")
 --diamondStock = peripheral.wrap("redrouter_1")
 
+repeat
+	redCartNum = file.readLine()
+	redCartName = file.readLine()
+	redStockTable[redCartName] = peripheral.wrap("redrouter_"..redCartNum)
+	redStockSignal[redCartName] = 
+	--stockDepot = peripheralTable[item_name].items()
+	--outOfStockList[item_name] = not pcall(stockCount, stockDepot, 1) -- the pcall sends a "protected call" that returns true if the function is successful and false if it errors
+	--priceList[item_name] = item_price
+	--stockChute = peripheral.call("create:chute_"..chute_name, "list")
+	--lowStockList[item_name] = not pcall(stockCount, stockChute[1], 1) -- the pcall sends a "protected call" that returns true if the function is successful and false if it errors
+	
+	stockBuild = 0
+	if lowStockList[item_name] then
+		if not outOfStockList[item_name] then
+			for slot, item in pairs(peripheral.call("minecraft:barrel_"..barrel_name, "list")) do
+				if pcall(stockCount, item) then
+					stockBuild = stockBuild + 1
+				end
+			end
+			if stockBuild == 0 then
+				outOfStockList[item_name] = true
+			end
+		else
+			stockBuild = 0
+		end
+	else
+		stockBuild = 27
+	end
+	
+	stockAmountList[item_name] = stockBuild
+	print("lowStockList "..tostring(lowStockList[item_name]).."   outOfStockList "..tostring(outOfStockList[item_name]).."  "..stockBuild)
+
+	file.close()
+	counter = counter + 1
+	file = fs.open("saharasaves/depot"..counter,"r")
+	print(file)
+until file == nil
+
 camel.requestStock()
 
 print("itemList recieved")

@@ -173,12 +173,7 @@ repeat
 			monitor.write("Use console for input")
 			print("enter the station's name")
 			stationName = read()
-			fs.makeDir("saharasaves")
-			local file = fs.open("saharasaves/station","w")
-			file.writeLine(stationName)
-			file.close()
-			print("enter the item's name")
-			item = read()
+			camel.setStation(stationName)
 		elseif input == "DONE" then
 			break
 		elseif input == "SAVE" then
