@@ -9,7 +9,7 @@ function tot.listLen(list)
 	end
 	return counter
 end
-function tot.ChaniedIsShort(string, maxChunkSize)
+function tot.splitString(string, maxChunkSize)
     local chunks = {} 
     local chunk = "" 
     for word in string:gfind("%A?%a+%A?") do 
