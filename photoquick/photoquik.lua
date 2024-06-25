@@ -102,7 +102,7 @@ function generateReceipt(playerName, orderList, nationName) -- orderList = {fram
                 frameCurrency = frameCurrency.."s"
             end
         if frameType == "of onsite work" then
-            day = "day " and amount == 1 or "days "
+            day = "day " and ammount == 1 or "days "
             table.insert(receipt, ammount.."x "..day..frameType.." in "..nationName..": "..frameCost.." "..frameCurrency)
         else
             table.insert(receipt, ammount.."x "..frameType..": "..frameCost.." "..frameCurrency)
