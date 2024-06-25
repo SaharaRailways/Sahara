@@ -21,8 +21,8 @@ function createInputBox(x,y,len)
                 isEditing = false
             end
         elseif event == "key" and isEditing then
-            local key = eventData[2]
-            if key > 0 and key < 256 then
+            local key = keys.getName(eventData[2])
+            switch 
             stg = stg..string.char(key)
             elseif key == 257 then
                 isEditing = false
@@ -53,14 +53,14 @@ function setupScreen(options) --{{option name = string, option info = string, ba
     end
 end
 
-function printReceipt(playerName, receipt, priceList)
+function printReceipt(playerName, receipt, priceList, nationName)
     printer = peripheral.find("printer")
     printer.newPage()
     cursorPos = 1
     local total = 0
     printer.setPageTitle("Receipt from Phottoquick")
     printer.setCursorPos(1,1)
-    printer.write("Invoice for "..playerName.. ":")
+    printer.write("Invoice for "..playerName.. " for nation:")
     for i = 1, #receipt do
         cursorPos = cursorPos + 1
         printer.setCursorPos(1,cursorPos)
@@ -107,6 +107,6 @@ function generateReceipt(playerName, orderList, nationName) -- orderList = {fram
         end
         table.insert(priceList, frameCost * ammount)
     end
-    printReceipt(playerName,receipt,{1,2,3})
+    printReceipt(playerName,receipt,priceList,nationName)
 end
 setupScreen({{name="shi",info="this is a long sentance that will be split up using code. The line will wrap around the screen",BC = 1,TC = 5}})
