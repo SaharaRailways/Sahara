@@ -62,7 +62,7 @@ function printReceipt(playerName, receipt, priceList, nationName)
     for i = 1, #receipt do
         cursorPos = cursorPos + 1
         printer.setCursorPos(1,cursorPos)
-        printer.write(totAPI.ChaniedIsS receipt[i]..": "..priceList[i])
+        printer.write(totAPI.ChaniedIsShort( receipt[i]..": "..priceList[i]))
         total = total + priceList[i]
     end
     printer.setCursorPos(1,cursorPos+1)

@@ -1,6 +1,6 @@
 tot = {}
 
---tot is an API of miscellaneous functions observed to be used by Cockroaches in the Sahara desert
+--tot is an API of miscellaneous functions used by Cockroaches(And Sahara)
 function tot.listLen(list)
 	--returns the length of the list (this is for key value pairs)
 	local counter = 0
@@ -9,7 +9,7 @@ function tot.listLen(list)
 	end
 	return counter
 end
-function tot.splitToChunksByWords(string, maxChunkSize)
+function tot.ChaniedIsShort(string, maxChunkSize)
     local chunks = {} 
     local chunk = "" 
     for word in string:gfind("%A?%a+%A?") do 
