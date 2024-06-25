@@ -22,7 +22,7 @@ function createInputBox(x,y,len)
             end
         elseif event == "key" and isEditing then
             local key = keys.getName(eventData[2])
-            switch 
+            local switch = {sus = function ()}
             stg = stg..string.char(key)
             elseif key == 257 then
                 isEditing = false
@@ -64,7 +64,7 @@ function printReceipt(playerName, receipt, priceList, nationName)
     for i = 1, #receipt do
         cursorPos = cursorPos + 1
         printer.setCursorPos(1,cursorPos)
-        printer.write(name..": "..price)
+        printer.write(totAPI.spl receipt[i]..": "..priceList[i])
         total = total + priceList[i]
     end
     printer.setCursorPos(1,cursorPos+1)
@@ -73,9 +73,7 @@ function printReceipt(playerName, receipt, priceList, nationName)
     
 end
 -- "ooga booga" - QuickPlayz_ 19/06/2024
-function cost(frameType) --returns cost of frame type
-    local frameType = "frameType1"        
-    local frameCost = 0
+function cost(frameType) --returns cost of frame type   
     if frameType == "B&W frames" then
         return 1, "cog"
     elseif frameType == "trichromatic frames" then
@@ -84,8 +82,10 @@ function cost(frameType) --returns cost of frame type
         return 16, "cog"
     elseif frameType == "days of onsite work" then
         return 1, "sun"
+    else
+        error("Invalid frame type")
     end
-    return frameCost
+    
     -- [16]x colour frames for [16 cogs]
     -- [15]x trichromatic frames for [16 cogs]
     -- [11]x B&W frames for [16 cogs]
@@ -110,3 +110,5 @@ function generateReceipt(playerName, orderList, nationName) -- orderList = {fram
     printReceipt(playerName,receipt,priceList,nationName)
 end
 setupScreen({{name="shi",info="this is a long sentance that will be split up using code. The line will wrap around the screen",BC = 1,TC = 5}})
+
+generateReceipt("QuickPlayz_", {["B&W frames"] = 11, ["trichromatic frames"] = 15, ["full color frames"] = 16, ["days of onsite work"] = 1}, "Zealandia")
