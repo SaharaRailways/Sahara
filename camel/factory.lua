@@ -4,47 +4,48 @@ local tot = require("totAPI")
 modem = "modem_0"
 money_stock = peripheral.wrap("create:depot_22")
 money_drop = peripheral.wrap("create:depot_7")
-monitor = peripheral.wrap("monitor_2")
-monitor2 = peripheral.wrap("monitor_3")
---diamondStock = peripheral.wrap("redrouter_1")
 
+local file = fs.open("saharasaves/factory/powerside","r")
+local powerside = file.readLine()
+if not redstone.getInput(powerside) then
+	error("Computer is not powered, turn on to order",1)
+end
+
+local counter = 0
+local redCartCounter = 0
+local redStockTable = {}
+local redStockSignal = {}
 repeat
+	counter = counter + 1
+	file = fs.open("saharasaves/factory/order/"..counter,"r")
+	if file == nil then
+		break
+	end
 	redCartNum = file.readLine()
-	redCartName = file.readLine()
-	redStockTable[redCartName] = peripheral.wrap("redrouter_"..redCartNum)
-	redStockSignal[redCartName] = 
-	--stockDepot = peripheralTable[item_name].items()
-	--outOfStockList[item_name] = not pcall(stockCount, stockDepot, 1) -- the pcall sends a "protected call" that returns true if the function is successful and false if it errors
-	--priceList[item_name] = item_price
-	--stockChute = peripheral.call("create:chute_"..chute_name, "list")
-	--lowStockList[item_name] = not pcall(stockCount, stockChute[1], 1) -- the pcall sends a "protected call" that returns true if the function is successful and false if it errors
-	
-	stockBuild = 0
-	if lowStockList[item_name] then
-		if not outOfStockList[item_name] then
-			for slot, item in pairs(peripheral.call("minecraft:barrel_"..barrel_name, "list")) do
-				if pcall(stockCount, item) then
-					stockBuild = stockBuild + 1
-				end
-			end
-			if stockBuild == 0 then
-				outOfStockList[item_name] = true
-			end
-		else
-			stockBuild = 0
-		end
+	if redCartNum == "0" then
+		--skips the order
+		file.close()
 	else
-		stockBuild = 27
+		local redCartName = file.readLine()
+		local redCartSide = file.readLine()
+		redStockTable[redCartName] = peripheral.wrap("redrouter_"..redCartNum)
+		redStockSignal[redCartName] = redStockTable[redCartName].getInput(redCartSide)
+		if redStockSignal[redCartName] then
+			redCartCounter = redCartCounter + 1
+		end
+		file.close()
 	end
 	
-	stockAmountList[item_name] = stockBuild
-	print("lowStockList "..tostring(lowStockList[item_name]).."   outOfStockList "..tostring(outOfStockList[item_name]).."  "..stockBuild)
+until false
 
-	file.close()
-	counter = counter + 1
-	file = fs.open("saharasaves/depot"..counter,"r")
-	print(file)
-until file == nil
+if redCartCounter == 0 then
+	file = fs.open("saharasaves/factory/terminate","r")
+	if file.readLine() == "true" then
+		print("No carts requested, terminating computer in 10 seconds")
+		sleep(10)
+		os.shutdown()
+	end
+end
 
 camel.requestStock()
 
@@ -63,21 +64,9 @@ local input = ""
 
 repeat
 	local event, monitorID, xpos, ypos = os.pullEvent("key")
-		print("Type ADD to add an item to the cart, SAVE to save the cart for later, READ to read saved a cart, CHANGE to change the saved station, or DONE to finish the order")
+		print("Type ADD to add an item to the cart, SAVE to save the cart for later, READ to read saved a cart, or DONE to finish the order")
 		input = read()
-		if input == "CHANGE" then
-			monitor.clear()
-			monitor.setCursorPos(1,1)
-			monitor.write("Use console for input")
-			print("enter the station's name")
-			stationName = read()
-			fs.makeDir("saharasaves")
-			local file = fs.open("saharasaves/station","w")
-			file.writeLine(stationName)
-			file.close()
-			print("enter the item's name")
-			item = read()
-		elseif input == "DONE" then
+		if input == "DONE" then
 			break
 		elseif input == "SAVE" then
 			print("enter the name of the cart")

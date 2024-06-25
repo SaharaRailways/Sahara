@@ -11,7 +11,7 @@ local barrel_num = read()
 print("What number is the item?")
 local item_num = read()
 
-fs.makeDir("saves") -- Here we make the folder the saves will go in.
+--fs.makeDir("saves") -- Here we make the folder the saves will go in.
 local file = fs.open("saharasaves/depot"..item_num,"w") -- This opens the file with the users name in the folder "saves" for writing.
 file.writeLine(name) -- Put the real name in the file.
 file.writeLine(price) -- Put the price in the file.
