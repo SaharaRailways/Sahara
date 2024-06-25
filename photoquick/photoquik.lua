@@ -54,7 +54,7 @@ end
 function printReceipt(playerName, receipt, priceList, nationName)
     printer = peripheral.find("printer")
     printer.newPage()
-    cursorPos = 1
+    local cursorPos = 1
     local total = 0
     printer.setPageTitle("Receipt from Phottoquick")
     printer.setCursorPos(1,1)
@@ -62,9 +62,10 @@ function printReceipt(playerName, receipt, priceList, nationName)
     for i = 1, #receipt do
         cursorPos = cursorPos + 1
         printer.setCursorPos(1,cursorPos)
-        splitShit = totAPI.splitString(receipt[i]..": "..priceList[i])
+        splitShit = totAPI.splitString(receipt[i]..": "..priceList[i], 25)
         for j = 1,#splitShit do
-            printer.write(screenW,cursorPos,splitShit[j])
+            printer.setCursorPos(1,cursorPos)
+            printer.write(splitShit[j])
             cursorPos = cursorPos + 1
         end
         total = total + priceList[i]
