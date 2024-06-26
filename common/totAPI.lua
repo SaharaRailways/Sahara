@@ -1,6 +1,6 @@
 tot = {}
 
---tot is an API of miscellaneous functions used by Cockroaches(And Sahara)
+--tot is an API of miscellaneous functions observed to be used by Cockroaches in the Sahara desert
 function tot.listLen(list)
 	--returns the length of the list (this is for key value pairs)
 	local counter = 0
