@@ -12,45 +12,39 @@ function createInputBox(x,y,len,def,BC,TC)
     InputBox.TC = TC or colours.white
     InputBox.message = ""
     function InputBox:getInput()
-        local eventData = {os.pullEvent()}
-        local event = eventData[1]
-        local switch = {
-                enter = function()    -- for case 1
+        while true do
+            local eventData = {os.pullEvent()}
+            local event = eventData[1]
+            if event == "mouse_click" then
+                local mouseX = eventData[3]
+                local mouseY = eventData[4]
+                if mouseX >= self.x and mouseX <= self.x+len-1 and mouseY == self.y then
+                    isEditing = true
+                else
                     isEditing = false
-                end,
-                backspace = function()    -- for case 2
-                    print "Case 2."
-                    self.message = self.message:sub(1,-2)
-                end,
-                delete = function()    -- for case 3
-                    self.message = self.message:sub(1,-2)
                 end
-            }
-        if event == "mouse_click" then
-            local mouseX = eventData[3]
-            local mouseY = eventData[4]
-            if mouseX >= self.x and mouseX <= self.x+len-1 and mouseY == self.y then
-                isEditing = true
+            elseif event == "key" and isEditing then
+                local key = keys.getName(eventData[2])
+                if key == "enter" then
+                    isEditing = false
+                    break
+                elseif key == "backspace" or "delete" then
+                    self.message = self.message:sub(1,-2)
+                elseif #key == 1 then
+                    self.message = self.message..key
+                end
+            end
+            term.setBackgroundColor(BC)
+            term.setTextColor(TC)
+            term.setCursorPos(self.x,self.y)
+            if #self.message > 0 then
+                prn = self.message
             else
-                isEditing = false
+                prn = self.def
             end
-        elseif event == "key" and isEditing then
-            local key = keys.getName(eventData[2])
-            if switch[key] then
-                switch[key]()
-            elseif #key == 1
-                self.message = self.message..key
-            end
+            term.write(prn:sub(-len,-1))
         end
-        term.setBackgroundColor(BC)
-        term.setTextColor(TC)
-        term.setCursorPos(self.x,self.y)
-        if #self.message > 0 then
-            prn = self.message
-        else
-            prn = self.def
-        end
-        term.write(prn:sub(-len,-1))
+        return InputBox.message
     end
     return InputBox
 end
@@ -61,8 +55,12 @@ function setupScreen(options) --{{option name = string, option info = string, ba
         local optionInfo = totAPI.splitString(option.info,screenW)
         local optionBC = option.BC
         local optionTC = option.TC
-        local isEditing = true
-        local stg = ""
+        inputBox.x = (screenW-screnW/4)/2
+        inputBox.y = screenL - screenL/8
+        inputBox.len = screenW/4
+        inputBox.def = option.name
+        inputBox.BC = optionBC
+        inputBox.TC = optionTC
         term.setBackgroundColour(optionBC)
         term.setTextColor(optionTC)
         term.clear()

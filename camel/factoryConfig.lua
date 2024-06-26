@@ -28,10 +28,10 @@ if input == "config" then
     else
         error("Invalid input: not an option for configuration")
     end
-elseif type(input) == "number" then
-    local orderNum = input
+elseif tonumber(input) then
+    local orderNum = tonumber(input)
     print("Enter the number of the redrouter, or enter 0 to skip the order")
-    local redRouterNum = file.readLine()
+    local redRouterNum = read()
     print("Enter the name of the saved cart")
     local name = read()
     print("Enter the side of the redrouter that the redstone signal will come from (left, right, front, back, top, bottom)")

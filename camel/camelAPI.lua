@@ -89,7 +89,6 @@ end
 function camel.readSavedCart(cartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
     -- Read a saved cart list from a file in the saharasaves folder and appends it to the inputted cart list
     local file = fs.open("saharasaves/cart/"..cartName,"r")
-    cartList = {}
     while true do
         local item = file.readLine()
         if item == nil then
@@ -107,23 +106,25 @@ function camel.getDepotItem(depotName)
 end
 
 function camel.addToCart(item, outOfStockList, cartList, priceList, lowStockList, stockAmountList, price, ammount)
-
-	if not outOfStockList[item] then
-		if cartList[item] == nil then
-			cartList[item] = 0
-		end
-		if lowStockList[item] then
-			if cartList[item] + ammount <= stockAmountList[item] then
-				print(item)
-				cartList[item] = itemCartList[item] + ammount
-				price = priceList[item] + (price * ammount)
-			end
-		else
-			print(item)
-			cartList[item] = cartList[item] + ammount
-			price = priceList[item] + (price * ammount)
-		end
-	end
+    if price == nil then
+        price = 0
+    end
+    if not outOfStockList[item] then
+        if cartList[item] == nil then
+            cartList[item] = 0
+        end
+        if lowStockList[item] then
+            if cartList[item] + ammount <= stockAmountList[item] then
+                print(item)
+                cartList[item] = itemCartList[item] + ammount
+                price = (priceList[item] * ammount) + price
+            end
+        else
+            print(item)
+            cartList[item] = cartList[item] + ammount
+            price = (priceList[item] * ammount) + price
+        end
+    end
     return cartList, price
 end
 
