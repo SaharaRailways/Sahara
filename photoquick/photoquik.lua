@@ -2,19 +2,33 @@
 local totAPI = require("totAPI")
 local screenW,screenL = term.getSize()
 
-function createInputBox(x,y,len)
+function createInputBox(x,y,len,def,BC,TC)
     local InputBox = {}
-    InputBox.x = x
-    InputBox.y = y
-    InputBox.len = len
+    InputBox.x = x or 1
+    InputBox.y = y or 1
+    InputBox.len = len or 1
+    InputBox.def = def or ""
+    InputBox.BC = BC or colours.gray
+    InputBox.TC = TC or colours.white
     InputBox.message = ""
     function InputBox:getInput()
         local eventData = {os.pullEvent()}
         local event = eventData[1]
+        local switch = {
+                enter = function()    -- for case 1
+                    isEditing = false
+                end,
+                backspace = function()    -- for case 2
+                    print "Case 2."
+                    self.message = self.message:sub(1,-2)
+                end,
+                delete = function()    -- for case 3
+                    self.message = self.message:sub(1,-2)
+                end
+            }
         if event == "mouse_click" then
             local mouseX = eventData[3]
             local mouseY = eventData[4]
-            term.setCursorPos(mouseX,mouseY)
             if mouseX >= self.x and mouseX <= self.x+len-1 and mouseY == self.y then
                 isEditing = true
             else
@@ -22,17 +36,26 @@ function createInputBox(x,y,len)
             end
         elseif event == "key" and isEditing then
             local key = keys.getName(eventData[2])
-            local switch = {sus = function () end}
-            stg = stg..string.char(key)
-            
+            if switch[key] then
+                switch[key]()
+            elseif #key == 1
+                self.message = self.message..key
+            end
         end
-        term.setBackgroundColor(3)
-        term.setTextColor(7)
-        term.setCursorPos((screenW-screenW/4)/2,screenL/8)
-        term.write(stg:sub(-screenW/4,-1))
+        term.setBackgroundColor(BC)
+        term.setTextColor(TC)
+        term.setCursorPos(self.x,self.y)
+        if #self.message > 0 then
+            prn = self.message
+        else
+            prn = self.def
+        end
+        term.write(prn:sub(-len,-1))
     end
+    return InputBox
 end
 function setupScreen(options) --{{option name = string, option info = string, background colour = number, text colour = number},{...}}
+    local inputBox = createInputBox()
     for _,option in pairs(options) do
         local optionName = option.name
         local optionInfo = totAPI.splitString(option.info,screenW)
@@ -47,6 +70,7 @@ function setupScreen(options) --{{option name = string, option info = string, ba
             term.setCursorPos((screenW-#optionInfo[i])/2+1,(screenL-#optionInfo)/2+i)
             term.write(optionInfo[i])
         end
+        
         
     end
 end
