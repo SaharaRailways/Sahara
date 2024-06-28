@@ -92,7 +92,7 @@ function tot.createInputBox(x,y,len,def,BC,TC)--Create an input box "object"(A t
     InputBox.y = y or 1
     InputBox.len = math.floor(len or 1)
     InputBox.def = def or "" --default text for the input box
-    InputBox.BC = BC or colours.gray --background color
+    InputBox.BC = BC or colours.grey --background color
     InputBox.TC = TC or colours.white--text color
     InputBox.message = "" -- variable that stores the text you input
     function InputBox:getInput()
