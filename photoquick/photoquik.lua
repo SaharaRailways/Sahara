@@ -11,7 +11,7 @@ function setupScreen(options) --{{option default text= string, option info = str
         local optionBC = option.BC or colours.white
         local optionTC = option.TC or colours.black
         inputBox.def = option.defaultText or ""
-        inputBox.BC = colors.inputBC or colours.lightGray
+        inputBox.BC = option.inputBC or colours.lightGray
         inputBox.TC = option.inputTC or colours.gray
         inputBox.x = math.floor((screenW-screenW/4)/2)
         inputBox.y = math.floor(screenL - screenL/8)
