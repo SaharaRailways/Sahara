@@ -1,7 +1,13 @@
 --this is a test to see if it updates on github...
 local totAPI = require("totAPI")
 local screenW,screenL = term.getSize()
-
+--local requiredPeripherals = {{name = "depositor",info = "pick the side where the depositor is located relative to the computer"},{name = "printer"}}
+--local optionalPeripherals = {{name = "redrouter",info = "chose the peripheral"},"speaker","animatronic"}
+--if settings.load("photoquick.settings") then
+--    
+--else
+--    
+--end
 
 function setupScreen(options) --{{option default text= string, option info = string, background colour = number, text colour = number, inputBackground colour = number, input foreground colour = number},{...}}
     local inputBox = tot.createInputBox() --create an input box for the setup screen
