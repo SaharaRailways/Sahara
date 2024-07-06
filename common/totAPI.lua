@@ -147,7 +147,8 @@ function tot.createInputBox(x,y,len,def,BC,TC)--Create an input box "object"(A t
     end
     return InputBox
 end
-
+function tcraete()
+end
 function tot.printReceipt(playerName, receipt, priceList, pageHeader)
     local printer = peripheral.find("printer")
     printer.newPage()
