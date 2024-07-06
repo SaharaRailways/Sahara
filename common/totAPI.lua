@@ -87,15 +87,15 @@ function tot.fromCogs(ammount, type)
 end
 
 function tot.createInputBox(x,y,len,def,BC,TC)--Create an input box "object"(A table with some params and methods)
-    local InputBox = {}
-    InputBox.x = x or 1
-    InputBox.y = y or 1
-    InputBox.len = math.floor(len or 1)
-    InputBox.def = def or "" --default text for the input box
-    InputBox.BC = BC or colours.grey --background color
-    InputBox.TC = TC or colours.white--text color
-    InputBox.message = "" -- variable that stores the text you input
-    function InputBox:getInput()
+    local inputBox = {}
+    inputBox.x = x or 1
+    inputBox.y = y or 1
+    inputBox.len = math.floor(len or 1)
+    inputBox.def = def or "" --default text for the input box
+    inputBox.BC = BC or colours.grey --background color
+    inputBox.TC = TC or colours.white--text color
+    inputBox.message = "" -- variable that stores the text you input
+    function inputBox:getInput()
         local isEditing = false -- check whether you're inputting text or not
         local isShift = false --check if you're holding shift or not for typing Capital letter
         local spc = " " -- space character to fill the input box if there's not enough characters
@@ -143,11 +143,27 @@ function tot.createInputBox(x,y,len,def,BC,TC)--Create an input box "object"(A t
             term.write(prn..spc:rep(self.len-#prn)) --write the input and concat spaces to it if it's missing some characters(It places the cursor to the end of the input box which is bad)
             term.setCursorPos(self.x+#prn,self.y) --set cursor back to the end of the input text
         end
-        return InputBox.message
+        return self.message
     end
-    return InputBox
+    return inputBox
 end
-function tot.createDropwodn()
+function tot.createDropdown(x,y,contents) --
+    local dropDown = {}
+    dropDown.x = x
+    dropDown.y = y
+    dropDown.contents = contents
+    function dropDown:getInput()
+        while true do
+            eventData = os.eventPull()
+            local event = eventData[1]
+            self.contents.open = false
+            if event == "mouse_click" then
+                mouseX = eventData[2]
+                mouseY = eventData[3]
+                self.contents.open = (mouseX >= self.x and mouseX <= self.x+self.contents.len-1 and mouseY == self.y)
+            end
+        end
+    end
 end
 function tot.printReceipt(playerName, receipt, priceList, pageHeader)
     local printer = peripheral.find("printer")
