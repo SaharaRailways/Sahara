@@ -5,7 +5,7 @@ modem = "modem_0"
 money_stock = peripheral.wrap("create:depot_22")
 money_drop = peripheral.wrap("create:depot_7")
 
-function manualInput()
+function manualInput(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
 	repeat
 	event = os.pullEvent("key")
 	print("Type ADD to add an item to the cart, SAVE to save the cart for later, READ to read saved a cart, or DONE to finish the order")
@@ -19,22 +19,24 @@ function manualInput()
 	elseif input == "READ" then
 		print("enter the name of the cart")
 		local cartName = read()
-		itemCartList, price = camel.readSavedCart(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
+		itemCartList, price = camel.readSavedCart(itemCartList, outOfStockList, priceList, lowStockList, stockAmountList, price)
 	elseif input == "ADD" then
 		item = read()
 		itemCartList, price = camel.addToCart(item, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
 	end
 until false
+return itemCartList, price
 end
 
 
-function automaticInput(redStockSignal)
+function automaticInput(redStockSignal, itemCartList, outOfStockList, priceList, lowStockList, stockAmountList, price)
 	for cartName, signal in pairs(redStockSignal) do
 		if signal then
 			itemCartList, price = camel.readSavedCart(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
 			print("Cart "..cartName.." added to order")
 		end
 	end
+	return itemCartList, price
 end
 
 local file = fs.open("saharasaves/factory/powerside","r")
@@ -102,10 +104,10 @@ print("press any key to cancel the automatic order")
 local event = os.pullEvent()
 if event == "key" then
 	print("Automatic order cancelled")
-	manualInput()
+	itemCartList, price = manualInput(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
 elseif event == "timer" then
 	print("Initiating automatic order")
-	automaticInput(redStockSignal)
+	itemCartList, price = automaticInput(redStockSignal, itemCartList, outOfStockList, priceList, lowStockList, stockAmountList, price)
 end
 
 
@@ -114,7 +116,7 @@ print("your order contains")
 for item, amount in pairs(itemCartList) do
 	print(item..": "..amount)
 end
-
+print("Total price: "..price)
 camel.sendCoinsToTrain(price, money_stock, money_drop)
 
 if tot.listLen(itemCartList) > 0 then
@@ -124,10 +126,10 @@ if tot.listLen(itemCartList) > 0 then
 
 	if camel.sendCart(itemCartList, stationName) then
 		print("Order sent")
-		monitor.write("Order sent")
+		--monitor.write("Order sent")
 	else
 		error("Server not responding",1)
-		monitor.write("Server not responding")
+		--monitor.write("Server not responding")
 	end
 end
 
