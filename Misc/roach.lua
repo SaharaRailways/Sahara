@@ -1,3 +1,25 @@
+-- Auto generated script file --
+
+--hide vanilla model
+vanilla_model.PLAYER:setVisible(false)
+
+--hide vanilla armor model
+vanilla_model.ARMOR:setVisible(false)
+--re-enable the helmet item
+vanilla_model.HELMET_ITEM:setVisible(true)
+
+--hide vanilla cape model
+vanilla_model.CAPE:setVisible(false)
+
+--hide vanilla elytra model
+vanilla_model.ELYTRA:setVisible(false)
+
+--entity init event, used for when the avatar entity is loaded for the first time
+function events.entity_init()
+  --player functions goes here
+end
+
+--tick event, called 20 times per second
 local roach = true
 local roaches = models.model.root.Head.roach
 local xOffset = 0
@@ -6,6 +28,8 @@ local zOffset = 0
 local oldPos = vec(0,0,0)
 local sPos = vec(0,0,0)
 local curPos = vec(0,0,0)
+local sRot = vec(0,0,0)
+local curRot = vec(0,0,0)
 local myKey = keybinds:newKeybind("Name", "key.keyboard.u", false)
 local secKey = keybinds:newKeybind("Name", "key.keyboard.y", false)
 local thirdKey = keybinds:newKeybind("Name", "key.keyboard.h", false)
@@ -20,6 +44,7 @@ myKey:setOnPress(function()
   end
   roach = not roach
   if roach then
+    --print(roaches:getPos())
     roaches:setPos(0,0,0)
     roaches:setRot(0,0,0)
     roaches:moveTo(models.model.root.Head)
@@ -58,13 +83,25 @@ function events.tick()
   else
     yOffset = 0
   end
-  if math.abs(zOffset) > 0.5 then
+  if math.abs(zOffset) > 0.2 then
     zOffset = zOffset - 0.1*zOffset
   else
     zOffset = 0
   end
   if not roach then
   sPos = roaches:getPos()
-  curPos = roaches:getPos():add(vec(xOffset,yOffset,zOffset))
+  curPos = roaches:getPos():add(vec(xOffset,yOffset,zOffset):mul(player:getLookDir()))
+  end
+end
+
+
+function events.post_render(delta)
+  if not roach then
+    roaches:setPos(math.lerp(sPos,curPos,delta))
+    roaches:setRot(-player:getRot()[1],180-player:getRot()[2],0)
+    renderer:setCameraPivot(math.lerp(sPos,curPos,delta):div(vec(16,16,16)):add(vec(0,2,0)))
+  else
+    renderer:setOffsetCameraPivot(vec(0,0,0))
+    --renderer:setCameraPos(0,0,0)
   end
 end
