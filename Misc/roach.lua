@@ -29,14 +29,14 @@ local betterLookZ = 0
 
 local isFlying = false
 local watchingRoach = true
-local flyToggle = keybinds:newKeybind("Toggles the roach flying", "key.keyboard.i", false)
-local perspectiveToggle = keybinds:newKeybind("Switches between the player and roach perspective while it is flying", "key.keyboard.k", false)
+local flyToggle = keybinds:newKeybind("Toggles the roach flying", "key.keyboard.u", false)
+local perspectiveToggle = keybinds:newKeybind("Switches between the player and roach perspective while it is flying", "key.keyboard.o", false)
 local forwardKey = keybinds:newKeybind("Move forward", "key.keyboard.y", false)
 local backKey = keybinds:newKeybind("Move backwards", "key.keyboard.h", false)
 local leftKey = keybinds:newKeybind("Move left", "key.keyboard.g", false)
 local rightKey = keybinds:newKeybind("Move right", "key.keyboard.j", false)
-local upKey = keybinds:newKeybind("Move up", "key.keyboard.u", false)
-local downKey = keybinds:newKeybind("Move down", "key.keyboard.t", false)
+local upKey = keybinds:newKeybind("Move up", "key.keyboard.i", false)
+local downKey = keybinds:newKeybind("Move down", "key.keyboard.k", false)
 --entity init event, used for when the avatar entity is loaded for the first time
 function events.entity_init()
   playerRot = player:getRot()
