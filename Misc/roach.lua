@@ -28,6 +28,7 @@ local betterLookX = 0
 local betterLookZ = 0
 
 local isFlying = false
+local watchingRoach = true
 local flyToggle = keybinds:newKeybind("Toggles the roach flying", "key.keyboard.i", false)
 local perspectiveToggle = keybinds:newKeybind("Switches between the player and roach perspective while it is flying", "key.keyboard.k", false)
 local forwardKey = keybinds:newKeybind("Move forward", "key.keyboard.y", false)
@@ -60,13 +61,18 @@ flyToggle:setOnPress(function()
       roaches:setRot(roachRot)
       print(roaches:getPos())
       roaches:setParentType("WORLD")
+      watchingRoach = true
     else
       roaches:setPos(0,0,0)
       roaches:setRot(0,0,0)
       roaches:setParentType("NIL")
+      renderer:setOffsetCameraPivot(vec(0,0,0))
+      renderer:setCameraPos(0,0,0)
     end
 end)
-
+perspectiveToggle:setOnPress(function()
+    watchingRoach = not watchingRoach
+end)
 function events.tick()
 
 end
@@ -96,6 +102,7 @@ function events.post_render(delta)
     --  input:normalize()
     --end
     roachPos = roaches:getPos()
+    playerPos = player:getPos()
     movement = vec(0,0,0)
     velocity = velocity:mul(0.8,0.8,0.8)
     playerRot = player:getRot()
@@ -122,5 +129,17 @@ function events.post_render(delta)
     roaches:setRot(roachRot)
     --velocity = v1
     input = vec(0,0,0)
+    
+    if watchingRoach then
+      renderer:setCameraPivot(roachPos:div(vec(16,16,16)):add(vec(0,2,0)))
+    else
+      --renderer:setCameraPivot(playerPos:div(vec(16,16,16)):add(vec(0,2,0)))
+      --renderer:setOffsetCameraPivot(vec(0,0,0))
+      renderer:setCameraPos(vec(0,1,0))
+      print("player")
+    end
   end
+  --renderer:setCameraPivot(playerPos:div(vec(16,16,16)):add(vec(0,2,0)))
 end
+
+
