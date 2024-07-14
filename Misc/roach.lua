@@ -135,10 +135,11 @@ function events.post_render(delta)
     else
       --renderer:setCameraPivot(playerPos:div(vec(16,16,16)):add(vec(0,2,0)))
       --renderer:setOffsetCameraPivot(vec(0,0,0))
-      renderer:setCameraPos(vec(0,1,0))
-      print("player")
+      --renderer:setCameraPos(vec(0,1,0))
+      renderer:setCameraPivot()
     end
   end
+  renderer:setCameraPivot()
   --renderer:setCameraPivot(playerPos:div(vec(16,16,16)):add(vec(0,2,0)))
 end
 
