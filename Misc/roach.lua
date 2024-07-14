@@ -12,22 +12,30 @@ vanilla_model.ELYTRA:setVisible(false)
 
 
 --tick event, called 20 times per second
-local isFlying = false
 local head = models.model.root.Head
 local roaches = models.model.root.Head.roach
 local followedModelPart = head
 local roachPos = roaches:partToWorldMatrix():apply():scale(16)-roaches:getPivot()
 local roachRot
 local playerRot
+
 local input = vec(0,0,0)
 local velocity = vec(0,0,0)
-local followRoach = keybinds:newKeybind("Follow the roach toggle", "key.keyboard.u", false)
-local forward = keybinds:newKeybind("Move forward", "key.keyboard.y", false)
-local back = keybinds:newKeybind("Move backwards", "key.keyboard.h", false)
-local left = keybinds:newKeybind("Move left", "key.keyboard.g", false)
-local right = keybinds:newKeybind("Move right", "key.keyboard.j", false)
-local up = keybinds:newKeybind("Move up", "key.keyboard.b", false)
-local down = keybinds:newKeybind("Move down", "key.keyboard.n", false)
+local movement = vec(0,0,0)
+local playerLook = vec(0,0,0)
+local betterLookScale = 0
+local betterLookX = 0
+local betterLookZ = 0
+
+local isFlying = false
+local flyToggle = keybinds:newKeybind("Toggles the roach flying", "key.keyboard.i", false)
+local perspectiveToggle = keybinds:newKeybind("Switches between the player and roach perspective while it is flying", "key.keyboard.k", false)
+local forwardKey = keybinds:newKeybind("Move forward", "key.keyboard.y", false)
+local backKey = keybinds:newKeybind("Move backwards", "key.keyboard.h", false)
+local leftKey = keybinds:newKeybind("Move left", "key.keyboard.g", false)
+local rightKey = keybinds:newKeybind("Move right", "key.keyboard.j", false)
+local upKey = keybinds:newKeybind("Move up", "key.keyboard.u", false)
+local downKey = keybinds:newKeybind("Move down", "key.keyboard.t", false)
 --entity init event, used for when the avatar entity is loaded for the first time
 function events.entity_init()
   playerRot = player:getRot()
@@ -44,7 +52,7 @@ function updatePosition()
     return
   end
 end
-followRoach:setOnPress(function()
+flyToggle:setOnPress(function()
     isFlying = not isFlying
     if isFlying then
       updatePosition()
@@ -58,27 +66,28 @@ followRoach:setOnPress(function()
       roaches:setParentType("NIL")
     end
 end)
+
 function events.tick()
 
 end
 
 function events.post_render(delta)
-  if forward:isPressed() then
+  if forwardKey:isPressed() then
     input[1] = input[1] + 1
   end
-  if back:isPressed() then
+  if backKey:isPressed() then
     input[1] = input[1] - 1
   end
-  if up:isPressed() then
+  if upKey:isPressed() then
     input[2] = input[2] + 1
   end
-  if down:isPressed() then
+  if downKey:isPressed() then
     input[2] = input[2] - 1
   end
-  if right:isPressed() then
+  if rightKey:isPressed() then
     input[3] = input[3] + 1
   end
-  if left:isPressed() then
+  if leftKey:isPressed() then
     input[3] = input[3] - 1
   end
 
@@ -87,19 +96,24 @@ function events.post_render(delta)
     --  input:normalize()
     --end
     roachPos = roaches:getPos()
+    movement = vec(0,0,0)
+    velocity = velocity:mul(0.8,0.8,0.8)
     playerRot = player:getRot()
     roachRot = vec(-playerRot[1],180-playerRot[2],0)
     playerLook = player:getLookDir()
     betterLookScale = 1/(math.abs(playerLook[1])+math.abs(playerLook[3]))
     betterLookX = playerLook[1]*betterLookScale
     betterLookZ = playerLook[3]*betterLookScale
+    movement = movement:add(0, input[2], 0)
     if not (input[1] == 0) then
-      roachPos = roachPos:add(betterLookX*input[1], 0, betterLookZ*input[1])
+      movement = movement:add(betterLookX*input[1], 0, betterLookZ*input[1])
     end
     if not (input[3] == 0) then
-      roachPos = roachPos:add(-1*(betterLookZ*input[3]), 0, betterLookX*input[3])
+      movement = movement:add(-1*(betterLookZ*input[3]), 0, betterLookX*input[3])
     end
-    local acceleration = 0.05
+    local acceleration = 0.5
+    velocity = velocity:add(movement*acceleration)
+    roachPos = roachPos:add(velocity)
     --local dv = acceleration*delta
     --local v0 = velocity
     --local v1 = velocity+dv
@@ -110,43 +124,3 @@ function events.post_render(delta)
     input = vec(0,0,0)
   end
 end
-
-
---[[
-  speed = 5
-  playerLook = player:getLookDir()
-  betterLookScale = 1/(math.abs(playerLook[1])+math.abs(playerLook[3]))
-  betterLookX = playerLook[1]*betterLookScale*speed--*math.sign(playerLook[3])
-  betterLookZ = playerLook[3]*betterLookScale*speed--*math.sign(playerLook[1])
-  betterLookY = 0
-  if up and (not down) then
-    betterLookY = speed
-  elseif down and (not up) then
-    betterLookY = -speed
-  end
-  curPos = curPos:add(0, betterLookY, 0)
-  --playerLook = vec(math.abs(playerLook[1]),math.abs(playerLook[2]),math.abs(playerLook[3]))
-  if toggle then
-  sPos = roaches:getPos()
-  end
-  if forward then
-    curPos = curPos:add(betterLookX, 0, betterLookZ)
-  end
-  if right then
-    curPos = curPos:add(1-betterLookZ, 0, betterLookX)
-  end
-  if left then
-    curPos = curPos:add(betterLookZ, 0, 1-betterLookX)
-  end
-  if backward then
-    curPos = curPos:add(1-betterLookX, 0, 1-betterLookZ)
-  end
-  
-  print("EEEEEEEEEEEE")
-  print(betterLookX)
-  print(betterLookZ)
-  print(betterLookY)
-  print(up)
-  print(down)
-  print(up and down)
-end]]
