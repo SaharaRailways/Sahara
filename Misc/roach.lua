@@ -12,12 +12,12 @@ vanilla_model.ELYTRA:setVisible(false)
 
 
 --tick event, called 20 times per second
-local isFollowing = false
+local isFlying = false
 local head = models.model.root.Head
 local roaches = models.model.root.Head.roach
 local followedModelPart = head
-local roachHeadPos = roaches:partToWorldMatrix():apply():scale(16)-roaches:getPivot()
-local roachHeadRot
+local roachPos = roaches:partToWorldMatrix():apply():scale(16)-roaches:getPivot()
+local roachRot
 local playerRot
 local input = vec(0,0,0)
 local velocity = vec(0,0,0)
@@ -31,13 +31,13 @@ local down = keybinds:newKeybind("Move down", "key.keyboard.n", false)
 --entity init event, used for when the avatar entity is loaded for the first time
 function events.entity_init()
   playerRot = player:getRot()
-  roachHeadRot = vec(-playerRot[1],180-playerRot[2],0)
+  roachRot = vec(-playerRot[1],180-playerRot[2],0)
   input = vec(0,0,0)
 end
 function updatePosition()
   if player:isLoaded() then
-    roachHeadRot = vec(-playerRot[1],180-playerRot[2],0)
-    roachHeadPos = roaches:partToWorldMatrix():apply():scale(16)-roaches:getPivot()
+    roachRot = vec(-playerRot[1],180-playerRot[2],0)
+    roachPos = roaches:partToWorldMatrix():apply():scale(16)-roaches:getPivot()
     input = vec(0,0,0)
     velocity = vec(0,0,0)
   else 
@@ -45,11 +45,11 @@ function updatePosition()
   end
 end
 followRoach:setOnPress(function()
-    isFollowing = not isFollowing
-    if isFollowing then
+    isFlying = not isFlying
+    if isFlying then
       updatePosition()
-      roaches:setPos(roachHeadPos+input*2)
-      roaches:setRot(roachHeadRot)
+      roaches:setPos(roachPos+input*2)
+      roaches:setRot(roachRot)
       print(roaches:getPos())
       roaches:setParentType("WORLD")
     else
@@ -81,21 +81,72 @@ function events.post_render(delta)
   if left:isPressed() then
     input[3] = input[3] - 1
   end
-  if isFollowing then
-    if input:lengthSquared() > 1 then
-      input:normalize()
-    end
-    roachHeadPos = roaches:getPos()
+
+  if isFlying then
+    --if input:lengthSquared() > 1 then
+    --  input:normalize()
+    --end
+    roachPos = roaches:getPos()
     playerRot = player:getRot()
-    roachHeadRot = vec(-playerRot[1],180-playerRot[2],0)
-    local acceleration = input*0.05
-    local dv = acceleration*delta
-    local v0 = velocity
-    local v1 = velocity+dv
-    local movement = (v0 + v1) * delta * 0.5
-    roaches:setPos(roachHeadPos+movement)
-    roaches:setRot(roachHeadRot)
-    velocity = v1
+    roachRot = vec(-playerRot[1],180-playerRot[2],0)
+    playerLook = player:getLookDir()
+    betterLookScale = 1/(math.abs(playerLook[1])+math.abs(playerLook[3]))
+    betterLookX = playerLook[1]*betterLookScale
+    betterLookZ = playerLook[3]*betterLookScale
+    if not (input[1] == 0) then
+      roachPos = roachPos:add(betterLookX*input[1], 0, betterLookZ*input[1])
+    end
+    if not (input[3] == 0) then
+      roachPos = roachPos:add(-1*(betterLookZ*input[3]), 0, betterLookX*input[3])
+    end
+    local acceleration = 0.05
+    --local dv = acceleration*delta
+    --local v0 = velocity
+    --local v1 = velocity+dv
+    --local movement = (velocity + velocity + acceleration*delta) * delta
+    roaches:setPos(roachPos)
+    roaches:setRot(roachRot)
+    --velocity = v1
     input = vec(0,0,0)
   end
 end
+
+
+--[[
+  speed = 5
+  playerLook = player:getLookDir()
+  betterLookScale = 1/(math.abs(playerLook[1])+math.abs(playerLook[3]))
+  betterLookX = playerLook[1]*betterLookScale*speed--*math.sign(playerLook[3])
+  betterLookZ = playerLook[3]*betterLookScale*speed--*math.sign(playerLook[1])
+  betterLookY = 0
+  if up and (not down) then
+    betterLookY = speed
+  elseif down and (not up) then
+    betterLookY = -speed
+  end
+  curPos = curPos:add(0, betterLookY, 0)
+  --playerLook = vec(math.abs(playerLook[1]),math.abs(playerLook[2]),math.abs(playerLook[3]))
+  if toggle then
+  sPos = roaches:getPos()
+  end
+  if forward then
+    curPos = curPos:add(betterLookX, 0, betterLookZ)
+  end
+  if right then
+    curPos = curPos:add(1-betterLookZ, 0, betterLookX)
+  end
+  if left then
+    curPos = curPos:add(betterLookZ, 0, 1-betterLookX)
+  end
+  if backward then
+    curPos = curPos:add(1-betterLookX, 0, 1-betterLookZ)
+  end
+  
+  print("EEEEEEEEEEEE")
+  print(betterLookX)
+  print(betterLookZ)
+  print(betterLookY)
+  print(up)
+  print(down)
+  print(up and down)
+end]]
