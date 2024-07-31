@@ -100,7 +100,7 @@ function events.tick()
 end
 
 function events.post_render(delta)
-  roachPos = roaches:getPos()
+  roachPos = player1:getPos()
   playerPos = player:getPos()
   movement = vec(0,0,0)
   velocity = velocity:mul(0.8,0.8,0.8)
@@ -124,8 +124,8 @@ function events.post_render(delta)
   --local v0 = velocity
   --local v1 = velocity+dv
   --local movement = (velocity + velocity + acceleration*delta) * delta
-  roaches:setPos(roachPos)
-  roaches:setRot(roachRot)
+  player1:setPos(roachPos)
+  player1:setRot(roachRot)
   --velocity = v1
 
 end
