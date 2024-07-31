@@ -16,8 +16,10 @@ local forward = keybinds:newKeybind("Name", "key.keyboard.u", false)
 local back = keybinds:newKeybind("Name", "key.keyboard.j", false)
 local left = keybinds:newKeybind("Name", "key.keyboard.h", false)
 local right = keybinds:newKeybind("Name", "key.keyboard.k", false)
+local calculateAABB = keybinds:newKeybind("Name", "key.keyboard.i", false)
 local jump = keybinds:newKeybind("Name", "key.keyboard.right.alt", false)
 local player1 = models.model.WORLD.player
+local input = vector(0,0,0)
 --player1:setPos(player1:partToWorldMatrix():apply()*16)
 local boxes = { }
 local miniDude = {}
@@ -48,65 +50,84 @@ end
 miniDude:new(player1)
 function events.entity_init()
 end
-function events.tick()
-  --input = vec(0,0,0)
-  if forward:isPressed() then
-    for _,modelPart in pairs(models.model.WORLD:getChildren()) do
-      local position = modelPart:partToWorldMatrix():apply()
-      local pivot = modelPart:getPivot()
-      local textureVertices = modelPart:getAllVertices()
-      for _,vertices in pairs(textureVertices) do
-        local smallest_vertex = vertices[1]:getPos()
-        local largest_vertex = smallest_vertex
-        for i = 2, #vertices do
-          local vertex = vertices[i]:getPos()
-          if vertex[1] < smallest_vertex[1] then
-            smallest_vertex = vertex
-          elseif vertex[1] == smallest_vertex[1] and vertex[2] < smallest_vertex[2] then
-            smallest_vertex = vertex
-          elseif vertex[1] == smallest_vertex[1] and vertex[2] == smallest_vertex[2] and vertex[3] < smallest_vertex[3] then
-            smallest_vertex = vertex
-          end
-          if vertex[1] > largest_vertex[1] then
-            largest_vertex = vertex
-          elseif vertex[1] == largest_vertex[1] and vertex[2] > largest_vertex[2] then
-            largest_vertex = vertex
-          elseif vertex[1] == largest_vertex[1] and vertex[2] == largest_vertex[2] and vertex[3] > largest_vertex[3] then
-            largest_vertex = vertex
-          end
+calculateAABB:onPress(function ()
+  for _,modelPart in pairs(models.model.WORLD:getChildren()) do
+    local position = modelPart:partToWorldMatrix():apply()
+    local pivot = modelPart:getPivot()
+    local textureVertices = modelPart:getAllVertices()
+    for _,vertices in pairs(textureVertices) do
+      local smallest_vertex = vertices[1]:getPos()
+      local largest_vertex = smallest_vertex
+      for i = 2, #vertices do
+        local vertex = vertices[i]:getPos()
+        if vertex[1] < smallest_vertex[1] then
+          smallest_vertex = vertex
+        elseif vertex[1] == smallest_vertex[1] and vertex[2] < smallest_vertex[2] then
+          smallest_vertex = vertex
+        elseif vertex[1] == smallest_vertex[1] and vertex[2] == smallest_vertex[2] and vertex[3] < smallest_vertex[3] then
+          smallest_vertex = vertex
         end
-        local aabb = {position+(smallest_vertex-pivot)/16,position+(largest_vertex-pivot)/16}
-        table.insert(boxes,aabb)
+        if vertex[1] > largest_vertex[1] then
+          largest_vertex = vertex
+        elseif vertex[1] == largest_vertex[1] and vertex[2] > largest_vertex[2] then
+          largest_vertex = vertex
+        elseif vertex[1] == largest_vertex[1] and vertex[2] == largest_vertex[2] and vertex[3] > largest_vertex[3] then
+          largest_vertex = vertex
+        end
       end
+      local aabb = {position+(smallest_vertex-pivot)/16,position+(largest_vertex-pivot)/16}
+      table.insert(boxes,aabb)
     end
+  end
+end)
+function events.tick()
+  input = vec(0,0,0)
+  if forward:isPressed() then
+    input[1] = input[1] + 1
   end
   if back:isPressed() then
-    local eyePos = player:getPos() + vec(0, player:getEyeHeight(), 0)
-    local eyeEnd = eyePos + (player:getLookDir() * 20)
-    local _, pos = raycast:aabb(eyePos,eyeEnd,boxes)
-    if pos then
-    player1:setPos(pos*16)
-    end
-    animations.model.walkin:play()
+    input[1] = input[1] - 1
   end
   if left:isPressed() then
-    input.z = -1
+    input[3] = input[3] + 1
   end
   if right:isPressed() then
-    input.z = 1
+    input[3] = input[3] - 1
   end
   if jump:isPressed() then
-    if velocity == 0 then
-    velocity = 1
-    end
+    input[2] = input[2] + 1
   end
-  --pPos = player1:getPos()
-  --local cameraForward = player:getLookDir()
-  --local cameraRight = cameraForward:crossed(vec(0,1,0))
-  --local movementVector = vec(cameraRight.x * input.z + cameraForward.x * input.x,0,cameraRight.z * input.z + cameraForward.z * input.x):normalize();
-  --player1:setPos(pPos)
-  --renderer:setCameraPos(0, 0, -3)
-  --renderer:setCameraPivot(pPos/16)
+end
+
+function events.post_render(delta)
+  roachPos = roaches:getPos()
+  playerPos = player:getPos()
+  movement = vec(0,0,0)
+  velocity = velocity:mul(0.8,0.8,0.8)
+  playerRot = player:getRot()
+  roachRot = vec(-playerRot[1],180-playerRot[2],0)
+  playerLook = player:getLookDir()
+  betterLookScale = 1/(math.abs(playerLook[1])+math.abs(playerLook[3]))
+  betterLookX = playerLook[1]*betterLookScale
+  betterLookZ = playerLook[3]*betterLookScale
+  if input[1] ~= 0 then
+    movement = movement:add(betterLookX*input[1], 0, betterLookZ*input[1])
+  end
+  if input[3] ~= 0 then
+    movement = movement:add(-1*(betterLookZ*input[3]), 0, betterLookX*input[3])
+  end
+  local acceleration = 1.2
+  velocity = velocity:add(movement*acceleration)
+  velocity = velocity*0.9
+  roachPos:add(velocity)
+  --local dv = acceleration*delta
+  --local v0 = velocity
+  --local v1 = velocity+dv
+  --local movement = (velocity + velocity + acceleration*delta) * delta
+  roaches:setPos(roachPos)
+  roaches:setRot(roachRot)
+  --velocity = v1
+
 end
 function events.render(delta)
 end

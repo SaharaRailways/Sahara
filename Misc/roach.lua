@@ -111,7 +111,6 @@ function events.post_render(delta)
     betterLookScale = 1/(math.abs(playerLook[1])+math.abs(playerLook[3]))
     betterLookX = playerLook[1]*betterLookScale
     betterLookZ = playerLook[3]*betterLookScale
-    movement = movement:add(0, input[2], 0)
     if input[1] ~= 0 then
       movement = movement:add(betterLookX*input[1], 0, betterLookZ*input[1])
     end
