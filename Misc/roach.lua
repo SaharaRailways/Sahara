@@ -112,15 +112,16 @@ function events.post_render(delta)
     betterLookX = playerLook[1]*betterLookScale
     betterLookZ = playerLook[3]*betterLookScale
     movement = movement:add(0, input[2], 0)
-    if not (input[1] == 0) then
+    if input[1] ~= 0 then
       movement = movement:add(betterLookX*input[1], 0, betterLookZ*input[1])
     end
-    if not (input[3] == 0) then
+    if input[3] ~= 0 then
       movement = movement:add(-1*(betterLookZ*input[3]), 0, betterLookX*input[3])
     end
-    local acceleration = 0.5
+    local acceleration = 1.2
     velocity = velocity:add(movement*acceleration)
-    roachPos = roachPos:add(velocity)
+    velocity = velocity*0.9
+    roachPos:add(velocity)
     --local dv = acceleration*delta
     --local v0 = velocity
     --local v1 = velocity+dv
