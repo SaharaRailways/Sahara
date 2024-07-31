@@ -19,7 +19,7 @@ local right = keybinds:newKeybind("Name", "key.keyboard.k", false)
 local calculateAABB = keybinds:newKeybind("Name", "key.keyboard.i", false)
 local jump = keybinds:newKeybind("Name", "key.keyboard.right.alt", false)
 local player1 = models.model.WORLD.player
-local input = vector(0,0,0)
+local input = vec(0,0,0)
 --player1:setPos(player1:partToWorldMatrix():apply()*16)
 local boxes = { }
 local miniDude = {}
