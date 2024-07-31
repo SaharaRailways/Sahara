@@ -20,6 +20,7 @@ local calculateAABB = keybinds:newKeybind("Name", "key.keyboard.i", false)
 local jump = keybinds:newKeybind("Name", "key.keyboard.right.alt", false)
 local player1 = models.model.WORLD.player
 local input = vec(0,0,0)
+local velocity = vec(0,0,0)
 --player1:setPos(player1:partToWorldMatrix():apply()*16)
 local boxes = { }
 local miniDude = {}
@@ -103,7 +104,7 @@ function events.post_render(delta)
   roachPos = player1:getPos()
   playerPos = player:getPos()
   movement = vec(0,0,0)
-  velocity = velocity:mul(0.8,0.8,0.8)
+  velocity = velocity*0.9
   playerRot = player:getRot()
   roachRot = vec(-playerRot[1],180-playerRot[2],0)
   playerLook = player:getLookDir()
