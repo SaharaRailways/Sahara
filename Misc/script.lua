@@ -90,10 +90,10 @@ function events.tick()
     input[1] = input[1] - 1
   end
   if left:isPressed() then
-    input[3] = input[3] + 1
+    input[3] = input[3] - 1
   end
   if right:isPressed() then
-    input[3] = input[3] - 1
+    input[3] = input[3] +1
   end
   if jump:isPressed() then
     input[2] = input[2] + 1
@@ -119,7 +119,6 @@ function events.post_render(delta)
   end
   local acceleration = 1.2
   velocity = velocity:add(movement*acceleration)
-  velocity = velocity*0.9
   roachPos:add(velocity)
   --local dv = acceleration*delta
   --local v0 = velocity
