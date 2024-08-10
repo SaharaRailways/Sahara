@@ -6,7 +6,6 @@ catch = {}
 --you don't have a choice lol
 
 function catch.setup(mainThread)
-    --don't call this function in your own code
     catchData = {}
     catchDataTemp = {}
     listenFor = {}
@@ -14,8 +13,10 @@ function catch.setup(mainThread)
 end
 
 function catch.listen()
+    --don't call this function in your own code
     while true do
         catchDataTemp = {os.pullEvent()}
+        print("catchDataTemp: " .. catchDataTemp[1])
         if listenFor[catchDataTemp[1]] then
             if catchData[catchDataTemp[1]] == nil then
                 catchData[catchDataTemp[1]] = {}
@@ -27,6 +28,10 @@ function catch.listen()
             listenFor[catchDataTemp[2]] = false
         end
     end
+end
+
+function catch.add()
+    
 end
 
 return catch
