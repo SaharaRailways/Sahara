@@ -35,3 +35,5 @@ function catch.add()
 end
 
 return catch
+
+--function mainThread() while true do sleep(1) os.queueEvent("test") end end
