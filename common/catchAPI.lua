@@ -1,6 +1,7 @@
 local catch = {}
 
 -- Internal function to listen for events
+-- Don't call this function in your own code
 function catch.listen()
     while true do
         local catchDataTemp = {os.pullEvent()}
