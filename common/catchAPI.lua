@@ -54,17 +54,28 @@ function catch.setup(mainThreadName)
 end
 
 -- An oversimplified way to get the data from the catchData table
-function catch.getData(eventName)
-    return catchData[eventName] or {}
+function catch.grab(eventName, pullAll)
+    if pullAll then
+        
+    else
+        return catchData[eventName] or {}
+    end
 end
 
 -- An oversimplified way to clear the data from the catchData table
-function catch.clearData(eventName)
+function catch.clear(eventName)
     if eventName then
         catchData[eventName] = nil
     else
         catchData = {}
     end
+end
+
+function catch.pop(eventName)
+    if eventName then
+        return table.remove(catchData[eventName])
+    end
+    
 end
 
 return catch
