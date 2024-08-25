@@ -16,23 +16,23 @@ function catch.listen()
 end
 
 -- Call this function to start listening for an event
-function catch.add(eventName)
+function catch.addGrab(eventName)
     listenFor[eventName] = true
 end
 
 --Call this function to start listening for all events
 --To stop listening for all events, call catch.remove("all")   -this will not delete the other listenFor entries, only prevent every event from being caught
-function catch.addAll()
+function catch.addAllGrabs()
     listenFor["all"] = true
 end
 
 -- Call this function to stop listening for an event
-function catch.remove(eventName)
+function catch.removeGrab(eventName)
     listenFor[eventName] = false
 end
 
 --Call this function to stop listening to any events spcified by catch.add()
-function catch.removeAll()
+function catch.removeAllGrabs()
     listenFor = {}
 end
 
@@ -54,26 +54,35 @@ function catch.setup(mainThreadName)
 end
 
 -- An oversimplified way to get the data from the catchData table
-function catch.grab(eventName, pullAll)
+function catch.pull(eventName, pullAll) --pullAll is a boolean that determines if you want to pull all the data from the event or just the most recent
     if pullAll then
-        
-    else
         return catchData[eventName] or {}
+    else
+        return catchData[eventName][1] or {}
     end
 end
 
 -- An oversimplified way to clear the data from the catchData table
-function catch.clear(eventName)
-    if eventName then
-        catchData[eventName] = nil
-    else
-        catchData = {}
-    end
-end
 
-function catch.pop(eventName)
+-- Returns the data from the catchData table and removes it from the table
+-- If you want to return and remove all events, call catch.pop() with no arguments
+function catch.pop(eventName, pullAll, deleteAll)
     if eventName then
-        return table.remove(catchData[eventName])
+        if deleteAll then
+            local tempData = catchData[eventName]
+            catchData[eventName] = {}
+            if pullAll then
+                return tempData or {}
+            else
+                return tempData[1]
+            end
+        else
+            return table.remove(catchData[eventName], 1)
+        end
+    else
+        local tempData = catchData
+        catchData = {}
+        return tempData or {}
     end
     
 end
