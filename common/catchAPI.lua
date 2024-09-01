@@ -53,7 +53,7 @@ function catch.setup(mainThreadName)
     end
 end
 
--- An oversimplified way to get the data from the catchData table
+-- Gets the data from the catchData table
 function catch.pull(eventName, pullAll) --pullAll is a boolean that determines if you want to pull all the data from the event or just the most recent
     if pullAll then
         return catchData[eventName] or {}
@@ -62,7 +62,7 @@ function catch.pull(eventName, pullAll) --pullAll is a boolean that determines i
     end
 end
 
--- An oversimplified way to clear the data from the catchData table
+-- Clears the data from the catchData table
 
 -- Returns the data from the catchData table and removes it from the table
 -- If you want to return and remove all events, call catch.pop() with no arguments
@@ -88,6 +88,3 @@ function catch.pop(eventName, pullAll, deleteAll)
 end
 
 return catch
-
--- Example main thread function
--- function mainThread() while true do sleep(1) os.queueEvent("test") end end
