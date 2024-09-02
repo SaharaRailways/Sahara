@@ -4,7 +4,8 @@ local station = peripheral.wrap("top")
 local export = peripheral.wrap("minecraft:barrel_2")
 local coins = peripheral.wrap("create:depot_4")
 local coin_stash = peripheral.wrap("create:depot_6")
-local sahara = require("saharaAPI")
+local sahara = require("camelAPI")
+local tot = require("totAPI")
 
 local function stockCount(stockChuteSlot, slotNum)
     return stockChuteSlot.count
@@ -70,13 +71,9 @@ function updateStock()
     until file == nil
 end
 
-
-repeat
-
-    transmitedID, message, protocol = rednet.receive("sahara")
-
-    if message == "itemList" then
-        print("recieved, message is itemList")
+function reciveRequest()
+    local transmitedID, message, protocol = rednet.receive("sahara")
+     if message == "stock" then
         updateStock()
         print("recieved, message is stock")
         local itemList = {}
@@ -89,81 +86,84 @@ repeat
         print("recieved, message is a table")
         rednet.send(transmitedID, "success", "sahara")
         print(message[1])
+    else
+        error("recieved, message is invalid")
+    end
+    return transmitedID, message, protocol
+end
+
+function makeSchedule(stationName)
+    local schedule = {
+        cyclic=false,
+        entries = {
         
+        {
+            instruction = {
+                id = "create:destination",
+                data = {
+                    text = stationName,
+                },
+            },
+            
+            conditions = {
+                {
+                {
+                    id = "create:idle",
+                        data = {
+                            value = 5,
+                            time_unit = 1,
+                        },
+                },
+                
+                
+                {
+                    id = "create:delay",
+                    data = {
+                    value = 10,
+                    time_unit = 1,
+                    },
+                },
+                },
+                
+            },
+        },
+        {
+            instruction = {
+                id = "create:destination",
+                data = {
+                    text = "warehouse",
+                },
+            },
+            conditions = {
+                {
+                    id = "create:delay",
+                    data = {
+                    value = 10,
+                    time_unit = 1,
+                    },
+                },
+            },
+        },
+        },
+    }
+    return schedule
+end
 
-
-
-
-
-
-
+repeat
+    local transmitedID, message, protocol = reciveRequest()
+    if type(message) == "table" then
         local counter = 0
-        local location = message[1]
-        local itemCartList = message[2]
+        local stationName, cartList = message[1], message[2]
         print("items are ...")
-        for name, amount in pairs(itemCartList) do
+        for name, amount in pairs(cartList) do
             print(name.." "..amount)
         end
         
-        local price = sahara.priceOfCartList(itemCartList, priceList)
+        local price = sahara.priceOfCartList(cartList, priceList)
         
-        print("sending banker to "..location)
-        
-        schedule = {
-            cyclic=false,
-            entries = {
-            
-            {
-                instruction = {
-                    id = "create:destination",
-                    data = {
-                        text = location,
-                    },
-                },
-                
-                conditions = {
-                    {
-                    {
-                        id = "create:idle",
-                            data = {
-                                value = 5,
-                                time_unit = 1,
-                            },
-                    },
-                    
-                    
-                    {
-                        id = "create:delay",
-                        data = {
-                        value = 10,
-                        time_unit = 1,
-                        },
-                    },
-                    },
-                    
-                },
-            },
-            {
-                instruction = {
-                    id = "create:destination",
-                    data = {
-                        text = "warehouse",
-                    },
-                },
-                conditions = {
-                    {
-                        id = "create:delay",
-                        data = {
-                        value = 5,
-                        time_unit = 1,
-                        },
-                    },
-                },
-            },
-            },
-        }
+        print("sending banker to "..stationName)
 
-        station.setSchedule(schedule)
+        station.setSchedule(makeSchedule(stationName))
 
         print("waiting for banker to return")
         repeat
@@ -186,16 +186,16 @@ repeat
                 stack_info = depot_info[1]
                 print(stack_info)
             until stack_info == nil
-                
+            
         else
-            print("no coins in the train")
+            error("no coins in the train")
         end
     
 
         if ammount_paid >= price then
-            print("sending items to "..location)
-        
-            for item, ammount in pairs(itemCartList) do
+            print("sending items to "..stationName)
+            
+            for item, ammount in pairs(cartList) do
                 for i = 1, ammount do
                     peripheralTable[item].pushItem(peripheral.getName(export),sahara.getDepotItem(peripheralTable[item]))
                     sleep(1)
@@ -203,63 +203,10 @@ repeat
             end
             sleep(1)
 
-            schedule = {
-                cyclic=false,
-                entries = {
-                {
-                    instruction = {
-                        id = "create:destination",
-                        data = {
-                            text = location,
-                        },
-                    },
-                    conditions = {
-                    {
-                    {
-                        id = "create:idle",
-                            data = {
-                                value = 5,
-                                time_unit = 1,
-                            },
-                    },
-                    
-                    
-                    {
-                        id = "create:delay",
-                        data = {
-                        value = 10,
-                        time_unit = 1,
-                        },
-                    },
-                    },
-                    },
-                },
-                {
-                    instruction = {
-                        id = "create:destination",
-                        data = {
-                            text = "warehouse",
-                        },
-                    },
-                    conditions = {
-                    {
-                    {
-                        id = "create:delay",
-                        data = {
-                            value = 10,
-                            time_unit = 1,
-                        },
-                    },
-                    },
-                    },
-                },  
-                },
-            }
-
-            station.setSchedule(schedule)
+            station.setSchedule(makeSchedule(stationName))
             
         end
-    else 
+    else
         print("invalid message")
     end
 

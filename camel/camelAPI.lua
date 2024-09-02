@@ -10,7 +10,7 @@ function camel.requestStock()
         return "Server not Open"
     end
 
-    rednet.send(server_ip,"itemList","sahara")
+    rednet.send(server_ip,"stock","sahara")
     local counter = 0
     repeat
         counter  = counter + 1
