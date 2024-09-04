@@ -6,6 +6,7 @@ local coins = peripheral.wrap("create:depot_4")
 local coin_stash = peripheral.wrap("create:depot_6")
 local sahara = require("camelAPI")
 local tot = require("totAPI")
+local catch = require("catchAPI")
 
 local function stockCount(stockChuteSlot, slotNum)
     return stockChuteSlot.count
