@@ -3,35 +3,61 @@ local catch = {}
 -- Internal function to listen for events
 -- Don't call this function in your own code
 function catch.listen()
+    listenFor["modem_message"] = true
     while true do
         local catchDataTemp = {os.pullEvent()}
         print("catchDataTemp: " .. catchDataTemp[1])
         if listenFor[catchDataTemp[1]] or listenFor["all"] then
-            if catchData[catchDataTemp[1]] == nil then
-                catchData[catchDataTemp[1]] = {}
+            if catchDataTemp[1] == "modem_message" then
+                if listenForProtocol[catchDataTemp[3]] then
+                    if catchData[catchDataTemp[1]] == nil then
+                        catchData[catchDataTemp[1]] = {}
+                    end
+                    table.insert(catchData[catchDataTemp[1]], 1, {catchDataTemp, os.clock()}) --REDUNDANT
+                end
+            else
+                if catchData[catchDataTemp[1]] == nil then
+                    catchData[catchDataTemp[1]] = {}
+                end
+                table.insert(catchData[catchDataTemp[1]], 1, {catchDataTemp, os.clock()}) --REDUNDANT
             end
-            table.insert(catchData[catchDataTemp[1]], 1, {catchDataTemp, os.clock()})
         end
     end
 end
 
--- Call this function to start listening for an event
+-- Starts listening for a specified event
 function catch.addGrab(eventName)
     listenFor[eventName] = true
 end
 
---Call this function to start listening for all events
---To stop listening for all events, call catch.remove("all")   -this will not delete the other listenFor entries, only prevent every event from being caught
-function catch.addAllGrabs()
-    listenFor["all"] = true
+-- Starts listening for any event (adds all events with a single event)
+function catch.addGrabAny()
+    listenFor["any"] = true
 end
 
--- Call this function to stop listening for an event
+-- Stops listening for any event, and instead listen for specified events (removes the event that listens for all events)
+-- undoes catch.addGrabAny()
+function catch.removeGrabAny()
+    listenFor["any"] = false
+end
+
+-- Adds a grab for a specific rednet protocal
+function catch.addRednetGrab(protocol)
+    listenForProtocol[protocol] = true
+end
+
+function catch.removeRednetGrab(protocol)
+    listenForProtocol[protocol] = false
+end
+
+
+
+-- Stops listening for the specified event
 function catch.removeGrab(eventName)
     listenFor[eventName] = false
 end
 
---Call this function to stop listening to any events spcified by catch.add()
+-- Stop listening to any events specified by catch.add()
 function catch.removeAllGrabs()
     listenFor = {}
 end
@@ -54,7 +80,7 @@ function catch.setup(mainThreadName)
 end
 
 -- Gets the data from the catchData table
-function catch.pull(eventName, pullAll) --pullAll is a boolean that determines if you want to pull all the data from the event or just the most recent
+function catch.pull(eventName, pullAll) -- pullAll is a boolean that determines if you want to pull all the data from the event or just the most recent
     if pullAll then
         return catchData[eventName] or {}
     else

@@ -1,4 +1,3 @@
---local modem = peripheral.wrap("back")
 local modem = "back"
 local station = peripheral.wrap("top")
 local export = peripheral.wrap("minecraft:barrel_2")
@@ -7,6 +6,74 @@ local coin_stash = peripheral.wrap("create:depot_6")
 local sahara = require("camelAPI")
 local tot = require("totAPI")
 local catch = require("catchAPI")
+
+function setup()
+    catch.setup("mainThread") --catch runs main thread in parallel with catch.listen
+end
+
+function mainThread()
+    repeat
+        local transmitedID, message, protocol = reciveRequest()
+        if type(message) == "table" then
+            local counter = 0
+            local stationName, cartList = message[1], message[2]
+            print("items are ...")
+            for name, amount in pairs(cartList) do
+                print(name.." "..amount)
+            end
+            
+            local price = sahara.priceOfCartList(cartList, priceList)
+            
+            print("sending banker to "..stationName)
+
+            station.setSchedule(makeSchedule(stationName))
+
+            print("waiting for banker to return")
+            repeat
+                sleep(5)
+            until station.isTrainPresent() == true
+            print("banker has returned")
+
+            local depot_info = coins.items()
+            print(depot_info[1])
+            local stack_info = depot_info[1]
+            print(stack_info.count)
+
+            local ammount_paid = 0
+            if stack_info then
+                repeat
+                    ammount_paid = ammount_paid + stack_info.count
+                    coins.pushItem(peripheral.getName(coin_stash),"minecraft:redstone")
+                    sleep(1.5)
+                    depot_info = coins.items()
+                    stack_info = depot_info[1]
+                    print(stack_info)
+                until stack_info == nil
+                
+            else
+                error("no coins in the train")
+            end
+        
+
+            if ammount_paid >= price then
+                print("sending items to "..stationName)
+                
+                for item, ammount in pairs(cartList) do
+                    for i = 1, ammount do
+                        peripheralTable[item].pushItem(peripheral.getName(export),sahara.getDepotItem(peripheralTable[item]))
+                        sleep(1)
+                    end
+                end
+                sleep(1)
+
+                station.setSchedule(makeSchedule(stationName))
+                
+            end
+        else
+            print("invalid message")
+        end
+    until redstone.getInput("left") == false
+end
 
 local function stockCount(stockChuteSlot, slotNum)
     return stockChuteSlot.count
@@ -150,67 +217,7 @@ function makeSchedule(stationName)
     return schedule
 end
 
-repeat
-    local transmitedID, message, protocol = reciveRequest()
-    if type(message) == "table" then
-        local counter = 0
-        local stationName, cartList = message[1], message[2]
-        print("items are ...")
-        for name, amount in pairs(cartList) do
-            print(name.." "..amount)
-        end
-        
-        local price = sahara.priceOfCartList(cartList, priceList)
-        
-        print("sending banker to "..stationName)
-
-        station.setSchedule(makeSchedule(stationName))
-
-        print("waiting for banker to return")
-        repeat
-            sleep(5)
-        until station.isTrainPresent() == true
-        print("banker has returned")
-
-        local depot_info = coins.items()
-        print(depot_info[1])
-        local stack_info = depot_info[1]
-        print(stack_info.count)
-
-        local ammount_paid = 0
-        if stack_info then
-            repeat
-                ammount_paid = ammount_paid + stack_info.count
-                coins.pushItem(peripheral.getName(coin_stash),"minecraft:redstone")
-                sleep(1.5)
-                depot_info = coins.items()
-                stack_info = depot_info[1]
-                print(stack_info)
-            until stack_info == nil
-            
-        else
-            error("no coins in the train")
-        end
-    
-
-        if ammount_paid >= price then
-            print("sending items to "..stationName)
-            
-            for item, ammount in pairs(cartList) do
-                for i = 1, ammount do
-                    peripheralTable[item].pushItem(peripheral.getName(export),sahara.getDepotItem(peripheralTable[item]))
-                    sleep(1)
-                end
-            end
-            sleep(1)
-
-            station.setSchedule(makeSchedule(stationName))
-            
-        end
-    else
-        print("invalid message")
-    end
-
-until redstone.getInput("left") == false
+--This is where the code actully runs
+setup()
 rednet.unhost("sahara", "saharaServer")
 rednet.close(modem)
