@@ -9,20 +9,23 @@ function catch.listen()
         print("catchDataTemp: " .. catchDataTemp[1])
         if listenFor[catchDataTemp[1]] or listenFor["all"] then
             if catchDataTemp[1] == "modem_message" then
-                if listenForProtocol[catchDataTemp[3]] then
-                    if catchData[catchDataTemp[1]] == nil then
-                        catchData[catchDataTemp[1]] = {}
-                    end
-                    table.insert(catchData[catchDataTemp[1]], 1, {catchDataTemp, os.clock()}) --REDUNDANT
+                if listenForProtocol[catchDataTemp[5].sProtocol] then
+                    catch.store(catchDataTemp)
                 end
             else
-                if catchData[catchDataTemp[1]] == nil then
-                    catchData[catchDataTemp[1]] = {}
-                end
-                table.insert(catchData[catchDataTemp[1]], 1, {catchDataTemp, os.clock()}) --REDUNDANT
+                catch.store(catchDataTemp)
             end
         end
     end
+end
+
+-- Internal function to store data 
+-- Only call this funciton if you know what you're doing
+function catch.store(storedData)
+    if catchData[storedData[1]] == nil then
+        catchData[storedData[1]] = {}
+    end
+    table.insert(catchData[storedData[1]], 1, {storedData, os.clock()})
 end
 
 -- Starts listening for a specified event
