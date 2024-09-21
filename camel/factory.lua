@@ -2,8 +2,8 @@ local camel = require("camelAPI")
 local tot = require("totAPI")
 
 modem = "modem_0"
-money_stock = peripheral.wrap("create:depot_22")
-money_drop = peripheral.wrap("create:depot_7")
+local money_stock = peripheral.wrap("create:depot_22")
+local money_drop = peripheral.wrap("create:depot_7")
 
 function manualInput(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
 	repeat
