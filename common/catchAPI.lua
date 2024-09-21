@@ -1,19 +1,42 @@
 local catch = {}
 
+function catch.setup(mainThreadName)
+
+    -- Get the function from the global table using its name
+    local mainThread = _G[mainThreadName]
+    local catchData = {}
+    local catchDataTemp = {}
+    local listenFor = {}
+    local enabled = true
+    local catchTemp = {}
+
+    -- Check if the function exists
+    if type(mainThread) == "function" then
+        parallel.waitForAny(catch.listen, mainThread)
+    else
+        error("Function " .. mainThreadName .. " does not exist")
+    end
+end
+
 -- Internal function to listen for events
 -- Don't call this function in your own code
 function catch.listen()
     listenFor["modem_message"] = true
     while true do
-        local catchDataTemp = {os.pullEvent()}
-        print("catchDataTemp: " .. catchDataTemp[1])
-        if listenFor[catchDataTemp[1]] or listenFor["all"] then
-            if catchDataTemp[1] == "modem_message" then
-                if listenForProtocol[catchDataTemp[5].sProtocol] then
+        if enabled then
+            local catchDataTemp = {os.pullEvent()}
+            print("catchDataTemp: " .. catchDataTemp[1])
+            if listenFor[catchDataTemp[1]] or listenFor["all"] then
+                if catchDataTemp[1] == "modem_message" then
+                    if listenForProtocol[catchDataTemp[5].sProtocol] then
+                        catch.store("rednet_message", catchDataTemp[4], catchDataTemp[5].message, catchDataTemp[5].sProtocol)
+                    end
+                    if listenFor["modem_message"] then
+                        catch.store(catchDataTemp)
+                    end
+                else
                     catch.store(catchDataTemp)
                 end
-            else
-                catch.store(catchDataTemp)
             end
         end
     end
@@ -25,7 +48,11 @@ function catch.store(storedData)
     if catchData[storedData[1]] == nil then
         catchData[storedData[1]] = {}
     end
-    table.insert(catchData[storedData[1]], 1, {storedData, os.clock()})
+    if catchData[storedData[1]] == "rednet_message" then
+        table.insert(catchData[storedData[1]], 1, {storedData[2], storedData[3], storedData[4]})
+    else
+        table.insert(catchData[storedData[1]], 1, storedData)
+    end
 end
 
 -- Starts listening for a specified event
@@ -44,16 +71,15 @@ function catch.removeGrabAny()
     listenFor["any"] = false
 end
 
--- Adds a grab for a specific rednet protocal
+-- Adds a grab for a specific rednet protocol
 function catch.addRednetGrab(protocol)
     listenForProtocol[protocol] = true
 end
 
+-- Stops listening for the specified rednet protocol
 function catch.removeRednetGrab(protocol)
     listenForProtocol[protocol] = false
 end
-
-
 
 -- Stops listening for the specified event
 function catch.removeGrab(eventName)
@@ -65,29 +91,37 @@ function catch.removeAllGrabs()
     listenFor = {}
 end
 
--- Provide the name of the script you want to run in parallel to the catchAPI (just put the name of the main function)
-function catch.setup(mainThreadName)
-    catchData = {}
-    catchDataTemp = {}
-    listenFor = {}
-
-    -- Get the function from the global table using its name
-    local mainThread = _G[mainThreadName]
-
-    -- Check if the function exists
-    if type(mainThread) == "function" then
-        parallel.waitForAny(catch.listen, mainThread)
-    else
-        error("Function " .. mainThreadName .. " does not exist")
-    end
+-- Enables listening for events
+function catch.enable()
+    enabled = true
 end
 
+-- Disables listening for events
+function catch.disable()
+    enabled = false
+end
+
+-- Provide the name of the script you want to run in parallel to the catchAPI (just put the name of the main function)
+
+
 -- Gets the data from the catchData table
-function catch.pull(eventName, pullAll) -- pullAll is a boolean that determines if you want to pull all the data from the event or just the most recent
+-- eventName is the name of the event you want to pull data from, or false to pull all events
+-- pullAll is a boolean that determines if you want to pull all the data from the event or just the most recent
+function catch.pull(eventName, pullAll) 
     if pullAll then
-        return catchData[eventName] or {}
+        if eventName then
+            return catchData[eventName] or {}
+        else
+            return catchData or {}
+        end
     else
-        return catchData[eventName][1] or {}
+        if eventName then
+            if eventName == "rednet_message" then
+                return {catchData[eventName][1][2], catchData[eventName][1][3], catchData[eventName][1][4]} or {}
+            else
+                return catchData[eventName][1] or {}
+            end
+        end
     end
 end
 
@@ -98,20 +132,20 @@ end
 function catch.pop(eventName, pullAll, deleteAll)
     if eventName then
         if deleteAll then
-            local tempData = catchData[eventName]
+            catchTemp = catchData[eventName]
             catchData[eventName] = {}
             if pullAll then
-                return tempData or {}
+                return catchTemp or {}
             else
-                return tempData[1]
+                return catchTemp[1] or {}
             end
         else
-            return table.remove(catchData[eventName], 1)
+            return table.remove(catchData[eventName], 1) or {}
         end
     else
-        local tempData = catchData
+        catchTemp = catchData
         catchData = {}
-        return tempData or {}
+        return catchTemp or {}
     end
     
 end
