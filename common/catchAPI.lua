@@ -3,12 +3,7 @@ local catch = {}
 function catch.setup(mainThreadName)
 
     -- Get the function from the global table using its name
-    local mainThread = _G[mainThreadName]
-    local catchData = {}
-    local catchDataTemp = {}
-    local listenFor = {}
-    local enabled = true
-    local catchTemp = {}
+    local mainThread = _ENV[mainThreadName]
 
     -- Check if the function exists
     if type(mainThread) == "function" then
@@ -21,6 +16,12 @@ end
 -- Internal function to listen for events
 -- Don't call this function in your own code
 function catch.listen()
+    catchData = {}
+    catchDataTemp = {}
+    listenFor = {}
+    listenForProtocol = {}
+    enabled = true
+    catchTemp = {}
     listenFor["modem_message"] = true
     while true do
         if enabled then
@@ -140,7 +141,12 @@ function catch.pop(eventName, pullAll, deleteAll)
                 return catchTemp[1] or {}
             end
         else
-            return table.remove(catchData[eventName], 1) or {}
+            catchTemp = {pcall(table.remove, catchData[eventName], 1)}
+            if catchTemp[1] then
+                return catchTemp[2]
+            else
+                return {}
+            end
         end
     else
         catchTemp = catchData
