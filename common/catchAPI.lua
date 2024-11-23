@@ -16,35 +16,32 @@ end
 -- Internal function to listen for events
 -- Don't call this function in your own code
 function catch.listen()
-    catchData = {}
-    catchDataTemp = {}
-    listenFor = {}
-    listenForProtocol = {}
-    enabled = true
-    catchTemp = {}
-    listenFor["modem_message"] = true
+    local catchData = {}
+    local catchDataTemp = {}
+    local listenFor = {}
+    local listenForProtocol = {}
+    local enabled = true
+    local catchTemp = {}
+    --All events return {eventName, arg1...}
+    --Rednet messages return {"modem_message", modem_name, channel, reply_channel, {message=, nMessageID=, nRecipient=, nSender=, sProtocol=}, distance}
+    --"rednet_message" is not a real event
     while true do
         if enabled then
             local catchDataTemp = {os.pullEvent()}
             print("catchDataTemp: " .. catchDataTemp[1])
             if listenFor[catchDataTemp[1]] or listenFor["all"] then
-                if catchDataTemp[1] == "modem_message" then
-                    if listenForProtocol[catchDataTemp[5].sProtocol] then
-                        catch.store("rednet_message", catchDataTemp[4], catchDataTemp[5].message, catchDataTemp[5].sProtocol)
-                    end
-                    if listenFor["modem_message"] then
-                        catch.store(catchDataTemp)
-                    end
-                else
-                    catch.store(catchDataTemp)
-                end
+                catch.store(catchDataTemp)
+            end
+            if listenForProtocol[catchDataTemp[5].sProtocol] then
+                catch.store("rednet_message", catchDataTemp[5].nSender, catchDataTemp[5].message, catchDataTemp[5].sProtocol)
+                --this mimics the structure of a rednet message, but adds on "rednet_message" to the beginning to be consistent with other events
             end
         end
     end
 end
 
 -- Internal function to store data 
--- Only call this funciton if you know what you're doing
+-- Stores data in the format {"eventName"={"eventname", arg2...}}     --eventname is arg1
 function catch.store(storedData)
     if catchData[storedData[1]] == nil then
         catchData[storedData[1]] = {}
@@ -73,6 +70,7 @@ function catch.removeGrabAny()
 end
 
 -- Adds a grab for a specific rednet protocol
+-- You have to open/host the rednet yourself
 function catch.addRednetGrab(protocol)
     listenForProtocol[protocol] = true
 end

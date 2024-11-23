@@ -1,4 +1,4 @@
-local modem = "back"
+Modem = "back"
 local station = peripheral.wrap("top")
 local export = peripheral.wrap("minecraft:barrel_2")
 local coins = peripheral.wrap("create:depot_4")
@@ -8,10 +8,13 @@ local tot = require("totAPI")
 local catch = require("catchAPI")
 
 function setup()
+    rednet.open(Modem)
+    rednet.host("sahara", "saharaServer")
     catch.setup("mainThread") --catch runs main thread in parallel with catch.listen
 end
 
 function mainThread()
+    catch.addRednetGrab("sahara")
     repeat
         local transmitedID, message, protocol = reciveRequest()
         if type(message) == "table" then
@@ -79,9 +82,6 @@ local function stockCount(stockChuteSlot, slotNum)
     return stockChuteSlot.count
 end
 
-rednet.open(modem)
-rednet.host("sahara", "saharaServer")
-
 function updateStock()
     peripheralTable = {}
     local counter = 1
@@ -141,7 +141,7 @@ end
 
 function reciveRequest()
     local transmitedID, message, protocol = rednet.receive("sahara")
-     if message == "stock" then
+    if message == "stock" then
         updateStock()
         print("recieved, message is stock")
         local itemList = {}
@@ -220,4 +220,4 @@ end
 --This is where the code actully runs
 setup()
 rednet.unhost("sahara", "saharaServer")
-rednet.close(modem)
+rednet.close(Modem)
