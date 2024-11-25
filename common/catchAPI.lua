@@ -35,6 +35,8 @@ function catch.listen()
             if listenForProtocol[catchDataTemp[5].sProtocol] then
                 catch.store("rednet_message", catchDataTemp[5].nSender, catchDataTemp[5].message, catchDataTemp[5].sProtocol)
                 --this mimics the structure of a rednet message, but adds on "rednet_message" to the beginning to be consistent with other events
+                --this is later removed when the data is pulled to be consistent with rednet messages 
+
             end
         end
     end
@@ -46,11 +48,7 @@ function catch.store(storedData)
     if catchData[storedData[1]] == nil then
         catchData[storedData[1]] = {}
     end
-    if catchData[storedData[1]] == "rednet_message" then
-        table.insert(catchData[storedData[1]], 1, {storedData[2], storedData[3], storedData[4]})
-    else
-        table.insert(catchData[storedData[1]], 1, storedData)
-    end
+    table.insert(catchData[storedData[1]], 1, storedData)
 end
 
 -- Starts listening for a specified event
@@ -109,16 +107,16 @@ end
 function catch.pull(eventName, pullAll) 
     if pullAll then
         if eventName then
-            return catchData[eventName] or {}
+            return catchData[eventName]
         else
-            return catchData or {}
+            return catchData
         end
     else
         if eventName then
             if eventName == "rednet_message" then
-                return {catchData[eventName][1][2], catchData[eventName][1][3], catchData[eventName][1][4]} or {}
+                return catchData[eventName][1][2], catchData[eventName][1][3], catchData[eventName][1][4]
             else
-                return catchData[eventName][1] or {}
+                return catchData[eventName][1]
             end
         end
     end
@@ -129,29 +127,29 @@ end
 -- Returns the data from the catchData table and removes it from the table
 -- If you want to return and remove all events, call catch.pop() with no arguments
 function catch.pop(eventName, pullAll, deleteAll)
+    local catchTemp
     if eventName then
         if deleteAll then
             catchTemp = catchData[eventName]
             catchData[eventName] = {}
             if pullAll then
-                return catchTemp or {}
+                return table.unpack(catchTemp)
             else
-                return catchTemp[1] or {}
+                return catchTemp[1]
             end
         else
             catchTemp = {pcall(table.remove, catchData[eventName], 1)}
             if catchTemp[1] then
                 return catchTemp[2]
             else
-                return {}
+                return nil
             end
         end
     else
         catchTemp = catchData
         catchData = {}
-        return catchTemp or {}
+        return table.unpack(catchTemp)
     end
-    
 end
 
 return catch

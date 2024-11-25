@@ -140,24 +140,26 @@ function updateStock()
 end
 
 function reciveRequest()
-    local transmitedID, message, protocol = rednet.receive("sahara")
-    if message == "stock" then
-        updateStock()
-        print("recieved, message is stock")
-        local itemList = {}
-        for key,value in pairs(peripheralTable) do
-            print(key)
-            table.insert(itemList, key)
+    local event, transmitedID, message, protocol = catch.pop("rednet_message")
+    if event ~= nil then
+        if message == "stock" then
+            updateStock()
+            print("recieved, message is stock")
+            local itemList = {}
+            for key,value in pairs(peripheralTable) do
+                print(key)
+                table.insert(itemList, key)
+            end
+            rednet.send(transmitedID, {itemList, priceList, lowStockList, outOfStockList, stockAmountList}, "sahara")
+        elseif type(message) == "table" then
+            print("recieved, message is a table")
+            rednet.send(transmitedID, "success", "sahara")
+            print(message[1])
+        else
+            error("recieved, message is invalid")
         end
-        rednet.send(transmitedID, {itemList, priceList, lowStockList, outOfStockList, stockAmountList}, "sahara")
-    elseif type(message) == "table" then
-        print("recieved, message is a table")
-        rednet.send(transmitedID, "success", "sahara")
-        print(message[1])
-    else
-        error("recieved, message is invalid")
+        return transmitedID, message, protocol
     end
-    return transmitedID, message, protocol
 end
 
 function makeSchedule(stationName)
