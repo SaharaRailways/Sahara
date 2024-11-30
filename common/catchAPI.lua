@@ -1,12 +1,15 @@
 local catch = {}
 
-function catch.setup(mainThreadName)
+function catch.setup(mainThreadName, CatchEnabled)
 
     -- Get the function from the global table using its name
     local mainThread = _ENV[mainThreadName]
 
     -- Check if the function exists
     if type(mainThread) == "function" then
+        if CatchEnabled == nil then
+            CatchEnabled = true
+        end
         parallel.waitForAny(catch.listen, mainThread)
     else
         error("Function " .. mainThreadName .. " does not exist")
@@ -20,13 +23,12 @@ function catch.listen()
     local catchDataTemp = {}
     local listenFor = {}
     local listenForProtocol = {}
-    local enabled = true
     local catchTemp = {}
     --All events return {eventName, arg1...}
     --Rednet messages return {"modem_message", modem_name, channel, reply_channel, {message=, nMessageID=, nRecipient=, nSender=, sProtocol=}, distance}
     --"rednet_message" is not a real event
     while true do
-        if enabled then
+        if CatchEnabled then
             local catchDataTemp = {os.pullEvent()}
             print("catchDataTemp: " .. catchDataTemp[1])
             if listenFor[catchDataTemp[1]] or listenFor["all"] then
@@ -90,12 +92,12 @@ end
 
 -- Enables listening for events
 function catch.enable()
-    enabled = true
+    CatchEnabled = true
 end
 
 -- Disables listening for events
 function catch.disable()
-    enabled = false
+    CatchEnabled = false
 end
 
 -- Provide the name of the script you want to run in parallel to the catchAPI (just put the name of the main function)

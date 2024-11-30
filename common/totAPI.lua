@@ -2,6 +2,11 @@ tot = {}
 
 --tot is an API of miscellaneous functions used across Sahara programs 
 --we put functions in here to help update them and prevent inconsistencies when the same function is used between programs
+function tot.require()
+    --in the future, this will be used to auto download updated versions of all of the Sahara Libraries
+end
+
+
 function tot.listLen(list)
 	--returns the length of the list (this is for key value pairs)
 	local counter = 0
@@ -11,18 +16,19 @@ function tot.listLen(list)
 	return counter
 end
 function tot.splitString(string, maxChunkSize)
+    --literally a rewrite of cc.pretty
     local chunks = {} 
     local chunk = "" 
     for word in string:gfind("%A?[%a%d]+%A?") do 
         if #chunk+#word < maxChunkSize then 
-            chunk = chunk..word 
+            chunk = chunk..word
         else 
             chunks[#chunks+1] = chunk 
             chunk = word 
         end 
     end
     chunks[#chunks+1] = chunk
-    return chunks
+    return chunks 
 end
 function tot.keyToIndex(list, key)
 	--turns key into its index in the list

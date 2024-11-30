@@ -1,19 +1,17 @@
---modem = peripheral.wrap("modem_0")
-
 local camel = require("camelAPI")
 local tot = require("totAPI")
 
-modem = "modem_0"
-money_stock = peripheral.wrap("create:depot_22")
-money_drop = peripheral.wrap("create:depot_7")
-monitor = peripheral.wrap("monitor_2")
-monitor2 = peripheral.wrap("monitor_3")
+Modem = peripheral.find("modem")
+local money_stock = peripheral.wrap("create:depot_22")
+local money_drop = peripheral.wrap("create:depot_7")
+local monitor = peripheral.wrap("monitor_2")
+local monitor2 = peripheral.wrap("monitor_3")
 
 function writeCart()
 
 
 	monitor2.clear()
-	max_scroll2 = math.ceil(#itemCartList / scroll_height) - 1
+	local max_scroll2 = math.ceil(#itemCartList / scroll_height) - 1
 	local scrollmin = scroll2 * scroll_height
 	local scrollmax = scrollmin + scroll_height + 1
 
@@ -82,41 +80,40 @@ function writeStock()
 	monitor.blit(string.sub("»",2,2), "b", "f")
 end
 
+function mainThread()
+	monitor.write("Waiting for Server")
+	camel.requestStock()
 
-monitor.write("Waiting for Server")
+	monitor.clear()
+	monitor2.clear()
+	monitor.setCursorPos(1,1)
 
-camel.requestStock()
-
-monitor.clear()
-monitor2.clear()
-monitor.setCursorPos(1,1)
-
-print("itemList recieved")
-itemList = message[1]
-priceList = message[2]
-lowStockList = message[3]
-outOfStockList = message[4]
-stockAmountList = message[5]
-print(message)
+	print("itemList recieved")
+	local itemList = message[1]
+	local priceList = message[2]
+	local lowStockList = message[3]
+	local outOfStockList = message[4]
+	local stockAmountList = message[5]
+	print(message)
 
 
-scroll = 0
-scroll2 = 0
+	local scroll = 0
+	local scroll2 = 0
 
-width, height = monitor.getSize()
-scroll_height = height - 2
-itemCartList = {}
-price = 0
-max_scroll = math.ceil(#itemList / scroll_height) - 1
-max_scroll2 = 0
-writeStock()
-writeCart()
+	local width, height = monitor.getSize()
+	local scroll_height = height - 2
+	local itemCartList = {}
+	local price = 0
+	local max_scroll = math.ceil(#itemList / scroll_height) - 1
+	local max_scroll2 = 0
+	writeStock()
+	writeCart()
 
-print("Select the item with the monitor or press any key to enter the item's name manually/change stored data")
+	print("Select the item with the monitor or press any key to enter the item's name manually/change stored data")
 
-local input = ""
+	local input = ""
 
-repeat
+	repeat
 	local event, monitorID, xpos, ypos = os.pullEvent()
 	if monitorID == "monitor_2" then
 		if event == "monitor_touch" then
@@ -172,7 +169,7 @@ repeat
 			monitor.setCursorPos(1,1)
 			monitor.write("Use console for input")
 			print("enter the station's name")
-			stationName = read()
+			local stationName = read()
 			camel.setStation(stationName)
 		elseif input == "DONE" then
 			break
@@ -191,10 +188,10 @@ repeat
 		end
 	end
 
-until input == "DONE"
+	until input == "DONE"
 
 
-if tot.listLen(itemCartList) > 0 then
+	if tot.listLen(itemCartList) > 0 then
 	monitor.clear()
 	monitor.setCursorPos(1,1)
 	monitor.setTextColour(1)
@@ -225,9 +222,9 @@ if tot.listLen(itemCartList) > 0 then
 	--end
 	--print("payment complete")
 		
-	
+
 	local file = fs.open("saharasaves/station","r")
-	stationName = file.readLine()
+	local stationName = file.readLine()
 	file.close()
 	monitor.clear()
 	monitor.setCursorPos(1,1)
@@ -247,7 +244,7 @@ if tot.listLen(itemCartList) > 0 then
 		--end
 	--end
 	--rednet.send(server_ip, {stationName, itemCartListSend}, "sahara")
-	
+
 	--local counter = 0
 	--repeat
 		--counter  = counter + 1
@@ -263,6 +260,9 @@ if tot.listLen(itemCartList) > 0 then
 	--monitor.setCursorPos(1,1)
 	--monitor.setTextColour(1)
 	--monitor.write("Order Complete")
+	end
+
+	rednet.close(Modem)
 end
 
-rednet.close(modem)
+camel.setup()
