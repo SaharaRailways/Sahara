@@ -114,7 +114,7 @@ function catch.pull(eventName, pullAll)
     else
         if eventName then
             if eventName == "rednet_message" then
-                return catchData[eventName][1][2], catchData[eventName][1][3], catchData[eventName][1][4]
+                return catchData[eventName][1]
             else
                 return catchData[eventName][1]
             end
