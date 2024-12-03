@@ -1,13 +1,15 @@
 local catch = {}
 
-function catch.setup(mainThreadName, CatchEnabled)
+function catch.setup(mainThreadName, CatchEnabled2)
 
     -- Get the function from the global table using its name
     local mainThread = _ENV[mainThreadName]
 
     -- Check if the function exists
     if type(mainThread) == "function" then
-        if CatchEnabled == nil then
+        if CatchEnabled2 == false then --catchEnabled is now global
+            CatchEnabled = false
+        else
             CatchEnabled = true
         end
         parallel.waitForAny(catch.listen, mainThread)
@@ -34,7 +36,25 @@ function catch.listen()
             if listenFor[catchDataTemp[1]] or listenFor["all"] then
                 catch.store(catchDataTemp)
             end
-            if listenForProtocol[catchDataTemp[5].sProtocol] then
+            if listenForProtocol[catchDataTemp[5].sProtocol]  then --needs to check if the event is a rednet message before checking the protocol!
+            --fix
+            --fix
+            --fix
+            --fix
+            --fix
+--fix
+        --fix
+
+
+
+
+
+
+
+
+
+
+        
                 catch.store("rednet_message", catchDataTemp[5].nSender, catchDataTemp[5].message, catchDataTemp[5].sProtocol)
                 --this mimics the structure of a rednet message, but adds on "rednet_message" to the beginning to be consistent with other events
                 --this is later removed when the data is pulled to be consistent with rednet messages 
