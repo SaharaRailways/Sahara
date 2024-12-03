@@ -19,17 +19,7 @@ function manualInput(itemCartList, cartName, outOfStockList, priceList, lowStock
 	elseif input == "READ" then
 		print("enter the name of the cart")
 		local cartName = read()
-		itemCartList, price = camel.readSavedCart(itemCartList, outOfStockList, priceList, lowStockList, stockAmountList, price) --FIX THIS! idk why i thought this was even close to correct.
---fix
---fix
---fix
---fix
---fix
---fix
---fix
---fix
---fix
-		--fix
+		itemCartList, price = camel.readSavedCart(itemCartList, cartName, outOfStockList, priceList, lowStockList, stockAmountList, price)
 	elseif input == "ADD" then
 		item = read()
 		itemCartList, price = camel.addToCart(item, outOfStockList, itemCartList, priceList, lowStockList, stockAmountList, price, 1)
