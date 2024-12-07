@@ -13,6 +13,10 @@ function catch.setup(mainThreadName, CatchEnabled2)
             CatchEnabled = true
         end
         parallel.waitForAny(catch.listen, mainThread)
+    elseif mainThreadName == "lua" then
+        parallel.waitForAny(catch.listen, "lua.lua")
+    elseif mainThreadName == nil then
+        error("No function name provided")
     else
         error("Function " .. mainThreadName .. " does not exist")
     end
@@ -36,29 +40,11 @@ function catch.listen()
             if listenFor[catchDataTemp[1]] or listenFor["all"] then
                 catch.store(catchDataTemp)
             end
-            if listenForProtocol[catchDataTemp[5].sProtocol]  then --needs to check if the event is a rednet message before checking the protocol!
-            --fix
-            --fix
-            --fix
-            --fix
-            --fix
---fix
-        --fix
-
-
-
-
-
-
-
-
-
-
-        
-                catch.store("rednet_message", catchDataTemp[5].nSender, catchDataTemp[5].message, catchDataTemp[5].sProtocol)
-                --this mimics the structure of a rednet message, but adds on "rednet_message" to the beginning to be consistent with other events
-                --this is later removed when the data is pulled to be consistent with rednet messages 
-
+            if catchDataTemp[1] == "modem_message" then
+                if listenForProtocol[catchDataTemp[5].sProtocol]  then
+                    catch.store("rednet_message", catchDataTemp[5].nSender, catchDataTemp[5].message, catchDataTemp[5].sProtocol)
+                    --this mimics the structure of a rednet message, but adds on "rednet_message" to the beginning to be consistent with other events
+                end
             end
         end
     end
